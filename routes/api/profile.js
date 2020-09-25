@@ -265,13 +265,21 @@ router.put('/education', [auth, [
     const {
         school,
         degree,
-        faculty
+        faculty,
+        from,
+        to,
+        current,
+        description
     } = req.body
 
     const newEdu = {
         school,
         degree,
-        faculty
+        faculty,
+        from,
+        to,
+        current,
+        description
     }
 
     try {

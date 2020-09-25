@@ -3,7 +3,8 @@ import profileActionTypes from '../actions/profile.types'
 const {
     GET_PROFILE,
     PROFILE_ERROR,
-    CLEAR_PROFILE
+    CLEAR_PROFILE,
+    UPDATE_PROFILE
 } = profileActionTypes;
 
 const INITIAL_STATE = {
@@ -19,6 +20,7 @@ const ProfileReducer = (state = INITIAL_STATE, action) => {
     const { type, payload } = action;
     switch (type) {
         case GET_PROFILE:
+        case UPDATE_PROFILE:     
             return {
                 ...state,
                 profile: payload,

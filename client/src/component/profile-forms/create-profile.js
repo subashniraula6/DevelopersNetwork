@@ -1,8 +1,9 @@
-import React, { Fragment, useState } from 'react'
+import React, { Fragment, useState, useEffect } from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import { createProfile } from '../../actions/profile.actions'
-import { withRouter } from 'react-router-dom'
+import { Link, withRouter } from 'react-router-dom'
+import Spinner from '../../component/layout/Spinner'
 
 const CreateProfile = ({ createProfile, history }) => {
     const [formData, setFormData] = useState({
@@ -21,7 +22,7 @@ const CreateProfile = ({ createProfile, history }) => {
     });
 
     const [addSocialNetworkLinks, setSocialNetworkLinks] = useState(false);
-    
+
     const {
         company,
         website,
@@ -43,7 +44,7 @@ const CreateProfile = ({ createProfile, history }) => {
     }
     const handleSubmit = (event) => {
         event.preventDefault();
-        
+
         createProfile(formData, history);
     }
 
@@ -152,7 +153,7 @@ const CreateProfile = ({ createProfile, history }) => {
                     )}
                 </div>
                 <input type="submit" className="btn btn-primary my-1" onClick={(e) => handleSubmit(e)} />
-                <a className="btn btn-light my-1" href="dashboard.html">Go Back</a>
+                <Link className="btn btn-light my-1" to="/dashboard">Go Back</Link>
             </form>
 
 
@@ -162,8 +163,7 @@ const CreateProfile = ({ createProfile, history }) => {
 }
 
 CreateProfile.propTypes = {
-    createProfile: PropTypes.func.isRequired,
-    profile: PropTypes.object
+    createProfile: PropTypes.func.isRequired
 }
 
 export default connect(null, { createProfile })(withRouter(CreateProfile));
