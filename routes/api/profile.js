@@ -33,7 +33,7 @@ router.get('/me', auth, async (req, res) => {
 // @route    POST api/profile/me
 // @desc     Make/Update profile
 // @access   Private 
-router.post('/me', [auth, [
+router.post('/', [auth, [
     check('skills', "Skills must be included")
         .not()
         .isEmpty(),

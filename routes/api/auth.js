@@ -42,8 +42,8 @@ router.post('/', [
 
         try {
             let user = await User.findOne({ email }) //return user and search by 'email'
-            //See if the user exists
-                
+            
+            //See if the user exists    
             if (!user) {
                 return res.status(400).json({ errors: [{ msg: "Invalid credentials" }] })
 

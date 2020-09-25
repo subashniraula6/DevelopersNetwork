@@ -1,18 +1,15 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { Redirect } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import authActionTypes from '../../actions/auth.types'
-
-const { LOGOUT_SUCCESS } = authActionTypes;
-
+import {logOutUser} from '../../actions/auth.actions'
 
 
-const Navbar = ({ auth: { isLoading, isAuthenticated }, logout }) => {
+const Navbar = ({ auth: { isLoading, isAuthenticated }, logOutUser }) => {
     const authLinks = (
         <ul>
-            <li><Link onClick={logout}> Logout </Link></li>
+            <li><i className="fas fa-sign-out-alt"></i><a href="#" onClick={logOutUser}> Logout </a></li>
         </ul>
     );
     const guestLinks = (
@@ -38,14 +35,10 @@ const Navbar = ({ auth: { isLoading, isAuthenticated }, logout }) => {
 }
 Navbar.propTypes = {
     auth: PropTypes.object,
-    logout: PropTypes.func.isRequired
+    logOutUser: PropTypes.func.isRequired
 }
 const mapStateToProps = state => ({
     auth: state.authReducer
 })
 
-const mapDispatchToProps = dispatch => ({
-    logout: () => dispatch({ type: LOGOUT_SUCCESS })
-})
-
-export default connect(mapStateToProps, mapDispatchToProps)(Navbar);
+export default connect(mapStateToProps, {logOutUser})(Navbar);

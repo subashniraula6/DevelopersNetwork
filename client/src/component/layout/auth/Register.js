@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { setAlert } from '../../../actions/alert.actions'
 import PropTypes from 'prop-types'
 import { registerUser } from '../../../actions/auth.actions'
-import { Redirect } from 'react-router-dom'
+import { Link, Redirect } from 'react-router-dom'
  
 const Register = ({ setAlert, registerUser, auth }) => {
 
@@ -83,7 +83,7 @@ const Register = ({ setAlert, registerUser, auth }) => {
                 <input type="submit" className="btn btn-primary" value="Register" />
             </form>
             <p className="my-1">
-                Already have an account? <a href="login.html">Sign In</a>
+                Already have an account? <Link to="/login">Sign In</Link>
             </p>
         </Fragment>
     )
@@ -92,8 +92,7 @@ const Register = ({ setAlert, registerUser, auth }) => {
 Register.propTypes = {
     setAlert: PropTypes.func.isRequired,
     registerUser: PropTypes.func.isRequired,
-    auth: PropTypes.bool,
-    logout: PropTypes.func.isRequired
+    auth: PropTypes.bool
 }
 
 const mapStateToProps = state => ({

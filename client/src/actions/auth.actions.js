@@ -2,12 +2,16 @@ import authActionTypes from '../actions/auth.types'
 import axios from 'axios'
 import { setAlert } from './alert.actions'
 import setAuthToken from '../utils/setAuthToken';
+import { clearProfile } from '../actions/profile.actions'
+
 const { REGISTER_SUCCESS,
     REGISTER_FAILURE,
     USER_LOADED,
     AUTH_ERROR,
     LOGIN_SUCCESS,
-    LOGIN_FAILURE
+    LOGIN_FAILURE,
+    LOGOUT_SUCCESS,
+    LOGOUT_FAILURE
 } = authActionTypes;
 
 
@@ -34,7 +38,7 @@ export const loadUser = () => async dispatch => {
 //Register User
 export const registerUser = (user) => async dispatch => {
     const config = {
-        'headers': {
+        headers: {
             'Content-Type': 'application/json'
         }
     }
@@ -97,4 +101,20 @@ export const loginUser = (userCredentials) => async dispatch => {
             type: LOGIN_FAILURE
         })
     }
+}
+//Logout User 
+export const logOutUser = () => dispatch =>{
+    try {
+      
+        dispatch(clearProfile())
+
+        dispatch({
+            type: LOGOUT_SUCCESS
+        })
+    } catch(error){
+        dispatch({
+            type: LOGOUT_FAILURE
+        })
+    }
+    
 }
