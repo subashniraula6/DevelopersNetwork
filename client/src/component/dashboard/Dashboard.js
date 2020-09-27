@@ -7,13 +7,13 @@ import Spinner from '../layout/Spinner'
 import DashboardAction from './DashboardActions'
 import ExperienceList from './ExperienceList'
 import EducationList from './EducationList'
-import {deleteAccount} from '../../actions/profile.actions'
+import { deleteAccount } from '../../actions/profile.actions'
 
 const Dashboard = ({ getCurrentProfile, deleteAccount, profile: { profile, isLoading }, auth: { user } }) => {
     useEffect(() => {
         getCurrentProfile();
     }, []);
-    if(user) console.log(user._id)
+    if (user) console.log(user._id)
     return isLoading && profile === null ? (<Spinner />) //second condition is used considering 
         //when reloading, initially both isLoading & profile=null true so spinner loads first time.
         : (
@@ -32,14 +32,14 @@ const Dashboard = ({ getCurrentProfile, deleteAccount, profile: { profile, isLoa
                         <DashboardAction />
                         <ExperienceList experience={profile.experience} />
                         <EducationList education={profile.education} />
-                        <div className="my-2">
-                            <button className="btn btn-danger" onClick={deleteAccount}>
-                                <i className="fas fa-user-minus"></i>
-                                &nbsp; Delete My Account
-                            </button>
-                        </div>
                     </Fragment>)
                 }
+                <div className="my-2">
+                    <button className="btn btn-danger" onClick={deleteAccount}>
+                        <i className="fas fa-user-minus"></i>
+                                &nbsp; Delete My Account
+                            </button>
+                </div>
             </Fragment>
         )
 }
