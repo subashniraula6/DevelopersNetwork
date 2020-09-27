@@ -4,7 +4,8 @@ const {
     GET_PROFILE,
     PROFILE_ERROR,
     CLEAR_PROFILE,
-    UPDATE_PROFILE
+    UPDATE_PROFILE,
+    ACCOUNT_DELETED
 } = profileActionTypes;
 
 const INITIAL_STATE = {
@@ -20,7 +21,7 @@ const ProfileReducer = (state = INITIAL_STATE, action) => {
     const { type, payload } = action;
     switch (type) {
         case GET_PROFILE:
-        case UPDATE_PROFILE:     
+        case UPDATE_PROFILE:
             return {
                 ...state,
                 profile: payload,
@@ -33,6 +34,7 @@ const ProfileReducer = (state = INITIAL_STATE, action) => {
                 isLoading: false //Mistakenly I misspelled loading. This created a huge error i.e. user with no profile dashboard is always loading(spinner)
             }
         case CLEAR_PROFILE:
+        case ACCOUNT_DELETED:
             return {
                 ...state,
                 profile: null,
@@ -40,7 +42,7 @@ const ProfileReducer = (state = INITIAL_STATE, action) => {
                 repos: [],
             }
 
-        default: return state; 
+        default: return state;
     }
 }
 export default ProfileReducer;

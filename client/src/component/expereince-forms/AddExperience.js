@@ -11,7 +11,7 @@ const AddExperience = ({addExperience, history}) => {
         location: '',
         from: '',
         to: '',
-        current: '',
+        current: false,
         description: ''
     })
     const {
@@ -31,9 +31,10 @@ const AddExperience = ({addExperience, history}) => {
         })
     }
 
+    const [ toDateDisabled, setToDateDisabled ] = useState(false);
+
     const handleSubmit = event => {
         event.preventDefault();
-  
         addExperience(experienceData, history);
     }
 
@@ -58,15 +59,21 @@ const AddExperience = ({addExperience, history}) => {
                     <input type="text" placeholder="Location" name="location" value={location} onChange={(e)=> handleChange(e)}/>
                 </div>
                 <div className="form-group">
-                    <h4>From Date</h4>
+                    <h4>*From Date</h4>
                     <input type="date" name="from" value={from} onChange={(e)=> handleChange(e)}/>
                 </div>
                 <div className="form-group">
-                    <p><input type="checkbox" name="current" value={current} onChange={(e)=> handleChange(e)}/> Current Job</p>
+                    <p><input type="checkbox" name="current" value={current} checked={current} onChange={()=> {
+                        setExperienceData({
+                            ...experienceData,
+                            current : !current
+                        })
+                        setToDateDisabled(!toDateDisabled)
+                    }} /> Current Job</p>
                 </div>
                 <div className="form-group">
                     <h4>To Date</h4>
-                    <input type="date" name="to" value={to} onChange={(e)=> handleChange(e)} />
+                    <input type="date" name="to" value={current ? '' : to} onChange={(e)=> handleChange(e)} disabled={toDateDisabled ? 'disabled' : null}/>
                 </div>
                 <div className="form-group">
                     <textarea

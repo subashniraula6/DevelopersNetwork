@@ -5,13 +5,15 @@ import { Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import Spinner from '../layout/Spinner'
 import DashboardAction from './DashboardActions'
+import ExperienceList from './ExperienceList'
+import EducationList from './EducationList'
+import {deleteAccount} from '../../actions/profile.actions'
 
-const Dashboard = ({ getCurrentProfile, profile: { profile, isLoading }, auth: { user } }) => {
-    
+const Dashboard = ({ getCurrentProfile, deleteAccount, profile: { profile, isLoading }, auth: { user } }) => {
     useEffect(() => {
         getCurrentProfile();
     }, []);
-    
+    if(user) console.log(user._id)
     return isLoading && profile === null ? (<Spinner />) //second condition is used considering 
         //when reloading, initially both isLoading & profile=null true so spinner loads first time.
         : (
@@ -28,16 +30,23 @@ const Dashboard = ({ getCurrentProfile, profile: { profile, isLoading }, auth: {
                     </Fragment>) :
                     (<Fragment>
                         <DashboardAction />
+                        <ExperienceList experience={profile.experience} />
+                        <EducationList education={profile.education} />
+                        <div className="my-2">
+                            <button className="btn btn-danger" onClick={deleteAccount}>
+                                <i className="fas fa-user-minus"></i>
+                                &nbsp; Delete My Account
+                            </button>
+                        </div>
                     </Fragment>)
                 }
-
             </Fragment>
         )
-
 }
 
 Dashboard.propTypes = {
     getCurrentProfile: PropTypes.func.isRequired,
+    deleteAccount: PropTypes.func.isRequired,
     auth: PropTypes.object.isRequired,
     profile: PropTypes.object.isRequired
 }
@@ -46,4 +55,4 @@ const mapStateToProps = state => ({
     auth: state.authReducer
 })
 
-export default connect(mapStateToProps, { getCurrentProfile })(Dashboard);
+export default connect(mapStateToProps, { getCurrentProfile, deleteAccount })(Dashboard);

@@ -4,7 +4,7 @@ import { addEducation } from '../../actions/profile.actions'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 
-const AddEducation = ({addEducation, history}) => {
+const AddEducation = ({ addEducation, history }) => {
 
     const [educationData, setEducationData] = useState({
         school: '',
@@ -12,7 +12,7 @@ const AddEducation = ({addEducation, history}) => {
         faculty: '',
         from: '',
         to: '',
-        current: '',
+        current: false,
         description: ''
     })
     const {
@@ -32,11 +32,14 @@ const AddEducation = ({addEducation, history}) => {
         })
     }
 
+    const [ toDateDisabled, setToDateDisabled ] = useState(false);
+
     const handleSubmit = event => {
         event.preventDefault();
-
         addEducation(educationData, history);
     }
+
+    console.log(educationData)
 
     return (
         <Fragment>
@@ -82,15 +85,22 @@ const AddEducation = ({addEducation, history}) => {
                 </div>
                 <div className="form-group">
                     <p>
-                        <input type="checkbox" name="current" 
-                        value={current}
-                        onChange={(e)=> handleChange(e)} /> Current School or Bootcamp
+                        <input type="checkbox" name="current"
+                            value={current}
+                            checked={current}
+                            onChange={(e) => {
+                                setEducationData({ ...educationData, current: !current });
+                                setToDateDisabled(!toDateDisabled);
+                            }} /> Current School or Bootcamp
           </p>
                 </div>
                 <div className="form-group">
                     <h4>To Date</h4>
                     <input type="date" name="to" value={to}
-                        onChange={(e)=> handleChange(e)} />
+                        value = { toDateDisabled ? '' : to }
+                        onChange={(e) => handleChange(e)}
+                        disabled={toDateDisabled ? 'disabled' : null}
+                    />
                 </div>
                 <div className="form-group">
                     <textarea
@@ -99,10 +109,10 @@ const AddEducation = ({addEducation, history}) => {
                         rows="5"
                         placeholder="Program Description"
                         value={description}
-                        onChange={(e)=> handleChange(e)}
+                        onChange={(e) => handleChange(e)}
                     ></textarea>
                 </div>
-                <input type="submit" className="btn btn-primary my-1" onClick={(e)=>handleSubmit(e)} />
+                <input type="submit" className="btn btn-primary my-1" onClick={(e) => handleSubmit(e)} />
                 <Link className="btn btn-light my-1" to="/dashboard">Go Back</Link>
             </form>
         </Fragment>

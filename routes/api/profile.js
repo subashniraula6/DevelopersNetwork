@@ -140,7 +140,7 @@ router.get('/user/:user_id', async (req, res) => {
 
 //@route Request-type='DELETE' End-point='api/profile/:id'
 // @route    DELETE profile
-// @desc     DELET profile, user , posts
+// @desc     DELETE profile, user , posts
 // @access   Private 
 router.delete('/', auth, async (req, res) => {
     try {
@@ -200,7 +200,7 @@ router.put('/experience', [auth, [
         current,
         description
     }
-
+    
     try {
         const profile = await Profile.findOne({ user: req.user.id });
 
@@ -234,7 +234,6 @@ router.delete('/experience/:exp_id', auth, async (req, res) => {
         await profile.save();
 
         res.json(profile);
-
 
     } catch (error) {
         console.error(error.message)
