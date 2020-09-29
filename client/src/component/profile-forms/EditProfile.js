@@ -26,23 +26,21 @@ const EditProfile = ({ profile: { profile, isLoading }, createProfile, getCurren
     useEffect(() => {
         getCurrentProfile();
 
-        console.log(profile)
-
         setFormData({
-            company: isLoading || !profile.company ? '' : profile.company,
-            website: isLoading || !profile.website ? '' : profile.website,
-            location: isLoading || !profile.location ? '' : profile.location,
-            bio: isLoading || !profile.bio ? '' : profile.bio,
-            status: isLoading || !profile.status ? '' : profile.status,
-            githubusername: isLoading || !profile.githubusername ? '' : profile.githubusername,
-            skills: isLoading || !profile.skills ? '' : profile.skills.join(','),
-            youtube: isLoading || !profile.social.youtube ? '' : profile.social.youtube,
-            facebook: isLoading || !profile.social.facebook ? '' : profile.social.facebook,
-            linkedin: isLoading || !profile.social.linkedin ? '' : profile.social.linkedin,
-            twitter: isLoading || !profile.social.twitter ? '' : profile.social.twitter,
-            instagram: isLoading || !profile.social.instagram ? '' : profile.social.instagram,
+            company: isLoading          || !profile.company ? '' : profile.company,
+            website: isLoading          || !profile.website ? '' : profile.website,
+            location: isLoading         || !profile.location? '' : profile.location,
+            bio: isLoading              || !profile.bio     ? '' : profile.bio,
+            status: isLoading           || !profile.status  ? '' : profile.status,
+            githubusername: isLoading   || !profile.githubusername ? '' : profile.githubusername,
+            skills: isLoading           || !profile.skills ? '' : profile.skills.join(','),
+            youtube: isLoading          || !profile.social  || !profile.social.youtube      ? '' : profile.social.youtube,
+            facebook: isLoading         || !profile.social  || !profile.social.facebook     ? '' : profile.social.facebook,
+            linkedin: isLoading         || !profile.social   || !profile.social.linkedin     ? '' : profile.social.linkedin,
+            twitter: isLoading          || !profile.social  || !profile.social.twitter      ? '' : profile.social.twitter,
+            instagram: isLoading        || !profile.social  || !profile.social.instagram    ? '' : profile.social.instagram,
         })
-    }, [isLoading]);
+    }, [isLoading, getCurrentProfile]);
 
     const {
         company,
@@ -65,7 +63,6 @@ const EditProfile = ({ profile: { profile, isLoading }, createProfile, getCurren
     }
     const handleSubmit = (event) => {
         event.preventDefault();
-
         createProfile(formData, history, true);
     }
 

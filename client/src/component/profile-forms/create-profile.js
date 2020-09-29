@@ -1,9 +1,8 @@
-import React, { Fragment, useState, useEffect } from 'react'
+import React, { Fragment, useState } from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import { createProfile } from '../../actions/profile.actions'
 import { Link, withRouter } from 'react-router-dom'
-import Spinner from '../../component/layout/Spinner'
 
 const CreateProfile = ({ createProfile, history }) => {
     const [formData, setFormData] = useState({

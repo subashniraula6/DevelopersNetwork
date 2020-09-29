@@ -5,7 +5,9 @@ const {
     PROFILE_ERROR,
     CLEAR_PROFILE,
     UPDATE_PROFILE,
-    ACCOUNT_DELETED
+    ACCOUNT_DELETED,
+    GET_PROFILES,
+    GET_GITHUBREPOS
 } = profileActionTypes;
 
 const INITIAL_STATE = {
@@ -41,7 +43,18 @@ const ProfileReducer = (state = INITIAL_STATE, action) => {
                 isLoading: false,
                 repos: [],
             }
-
+        case GET_PROFILES:
+            return {
+                ...state,
+                profiles: payload,
+                isLoading: false
+            }
+        case GET_GITHUBREPOS:
+            return {
+                ...state,
+                repos: payload,
+                isLoading: false
+            }   
         default: return state;
     }
 }

@@ -12,8 +12,7 @@ import { deleteAccount } from '../../actions/profile.actions'
 const Dashboard = ({ getCurrentProfile, deleteAccount, profile: { profile, isLoading }, auth: { user } }) => {
     useEffect(() => {
         getCurrentProfile();
-    }, []);
-    if (user) console.log(user._id)
+    }, [getCurrentProfile]);
     return isLoading && profile === null ? (<Spinner />) //second condition is used considering 
         //when reloading, initially both isLoading & profile=null true so spinner loads first time.
         : (

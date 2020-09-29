@@ -64,22 +64,32 @@ router.post('/', [auth, [
     //buid profile object
     const profileFields = {};
     profileFields.user = req.user.id;
-    if (company) profileFields.company = company;
-    if (website) profileFields.website = website;
-    if (location) profileFields.location = location;
-    if (bio) profileFields.bio = bio;
-    if (status) profileFields.status = status;
-    if (githubusername) profileFields.githubusername = githubusername;
-    if (skills) profileFields.skills = skills.split(',').map(skill => skill.trim())
+    //if (company) profileFields.company = company; //Problem arises when company field is updated to empty value.
+    profileFields.company = company ? company : "";
+    profileFields.website = website ? website : "";
+    profileFields.location = location ? location : "";
+    profileFields.bio = bio ? bio : "";
+    profileFields.status = status;// Required field
+    profileFields.githubusername = githubusername ? githubusername : "";
+    profileFields.skills = skills.split(',').map(skill => skill.trim()); //Required field
 
+
+    // //build profilefield's social object
+    // profileFields.social = {};
+    // if (youtube) profileFields.social.youtube = youtube;
+    // if (facebook) profileFields.social.facebook = facebook;
+    // if (instagram) profileFields.social.instagram = instagram;
+    // if (twitter) profileFields.social.twitter = twitter;
+    // if (linkedin) profileFields.social.linkedin = linkedin;
+    // This method results in undefined error since 'empty' field doesnt create object element 
 
     //build profilefield's social object
     profileFields.social = {};
-    if (youtube) profileFields.social.youtube = youtube;
-    if (facebook) profileFields.social.facebook = facebook;
-    if (instagram) profileFields.social.instagram = instagram;
-    if (twitter) profileFields.social.twitter = twitter;
-    if (linkedin) profileFields.social.linkedin = linkedin;
+    profileFields.social.youtube = youtube ? youtube : '';
+    profileFields.social.facebook = facebook ? facebook : '';
+    profileFields.social.instagram = instagram ? instagram : '';
+    profileFields.social.twitter = twitter ? twitter : '';
+    profileFields.social.linkedin = linkedin ? linkedin : '';
 
     try {
         const profile = await Profile.findOne({ user: req.user.id })
@@ -135,7 +145,6 @@ router.get('/user/:user_id', async (req, res) => {
         console.log(error.message)
         res.status(500).send("Server Error")
     }
-
 })
 
 //@route Request-type='DELETE' End-point='api/profile/:id'
@@ -344,7 +353,7 @@ router.get('/github/:username', (req, res) => {
         })
     } catch (err) {
         console.error(err.message);
-        res.status(500) / send('server error')
+        res.status(500).send('server error')
     }
 })
 
