@@ -108,7 +108,7 @@ router.post('/', [auth, [
         //create
         newProfile = new Profile(profileFields);
         await newProfile.save();
-        return res.json(newProfile)
+        res.json(newProfile)
 
     } catch (error) {
         console.error(error)
@@ -160,7 +160,7 @@ router.delete('/', auth, async (req, res) => {
         if (profile) await profile.remove();
         //Remove User
         await user.remove();
-        return res.json({ msg: "User successfully deleted" })
+        res.json({ msg: "User successfully deleted" })
 
     } catch (error) {
         //if(error.type === "null") return res.status(400).json({msg: "No user"})

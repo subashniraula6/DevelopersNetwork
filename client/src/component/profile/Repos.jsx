@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import { getGithubRepos } from '../../actions/profile.actions'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
@@ -7,7 +7,7 @@ import Spinner from '../layout/Spinner'
 const Repos = ({ repos, githubusername, getGithubRepos }) => {
     useEffect(() => {
         getGithubRepos(githubusername);
-    }, [])
+    }, [getGithubRepos, githubusername])
 
     return (
         <div className="profile-github">
@@ -16,14 +16,15 @@ const Repos = ({ repos, githubusername, getGithubRepos }) => {
             </h2>
             {repos === null ? <Spinner /> :
                 repos.map(repo => {
-                    const { _id,
+                    const { 
+                        id,
                         html_url,
                         name,
                         description,
                         stargazers_count,
                         watchers_count,
                         forks_count } = repo;
-                    return <div className='repo bg-white p-1 my-1' key={_id}>
+                    return <div className='repo bg-white p-1 my-1' key={id}>
                         <div>
                             <h4>
                                 <a href={html_url}

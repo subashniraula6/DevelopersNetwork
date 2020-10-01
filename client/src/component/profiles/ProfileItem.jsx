@@ -16,7 +16,7 @@ const ProfileItem = ({ profile: {
                 <img
                     className="round-img"
                     src={avatar}
-                    alt="Profile Picture"
+                    alt="Profile Pic"
                 />
                 <div>
                     <h2>{name}</h2>
