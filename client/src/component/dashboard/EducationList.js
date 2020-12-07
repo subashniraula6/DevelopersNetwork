@@ -28,7 +28,7 @@ const EducationList = ({ education, deleteEducation }) => {
         )
     })
     return (
-        <Fragment>
+        <section className="container">
             <h2 className='my-2'> Education Credentials </h2>
             <table className='table'>
                 <thead>
@@ -43,7 +43,7 @@ const EducationList = ({ education, deleteEducation }) => {
                     {educations}
                 </tbody>
             </table>
-        </Fragment>
+        </section>
     )
 }
 
