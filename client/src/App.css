@@ -18,9 +18,11 @@ body {
   font-size: 1rem;
   line-height: 1.6;
   background-color: #fff;
-  color: #333;
+  color: #263238;
 }
-
+.Link{
+  color: red !important;
+}
 a {
   color: var(--primary-color);
   text-decoration: none;
@@ -67,7 +69,7 @@ img {
 }
 
 .text-primary {
-  color: var(--primary-color);
+  color: #e91e63;
 }
 
 .text-dark {
@@ -214,6 +216,11 @@ img {
   border: #ccc solid 1px;
 }
 
+.bg-orange {
+  background: #6a1b9a;
+  border: 2px solid #4a148c;
+}
+
 .round-img {
   border-radius: 50%;
 }
@@ -245,7 +252,7 @@ img {
   color: #888;
 }
 
-.form input[type='text'],
+/* .form input[type='text'],
 .form input[type='email'],
 .form input[type='password'],
 .form input[type='date'],
@@ -256,7 +263,7 @@ img {
   padding: 0.4rem;
   font-size: 1.2rem;
   border: 1px solid #ccc;
-}
+} */
 
 .form input[type='submit'],
 button {
@@ -335,6 +342,7 @@ button {
   position: relative;
   background: url('./img/showcase.jpg') no-repeat center center/cover;
   height: 100vh;
+  border: 2px solid green;
 }
 
 .landing-inner {

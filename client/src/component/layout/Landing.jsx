@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom'
 import {connect} from 'react-redux'
 import {Redirect} from 'react-router-dom'
 import PropTypes from 'prop-types'
+import {ButtonGroup} from '@material-ui/core'
+import { Button } from '@material-ui/core'
 
 const Landing = ({isAuthenticated}) => {
     
@@ -19,10 +21,11 @@ const Landing = ({isAuthenticated}) => {
                         Create a developer profile/portfolio, share posts and get help from
                         other developers
           </p>
-                    <div className="buttons">
-                        <Link to="/register" className="btn btn-primary">Sign Up</Link>
-                        <Link to="/login" className="btn btn-light">Login</Link>
-                    </div>
+                    
+                    <ButtonGroup variant='contained' color="primary" size='large' aria-label="contained primary button group">
+                        <Button><Link to="/register" style={{'color': 'white'}}>Sign Up</Link></Button>
+                        <Button color="secondary"><Link to="/login" style={{'color': 'white'}}>Login</Link></Button>
+                    </ButtonGroup>
                 </div>
             </div>
         </section>

@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import Moment from 'react-moment'
 import { connect } from 'react-redux'
 import { deleteExperience } from '../../actions/profile.actions'
+import Button from '@material-ui/core/Button'
 
 const ExperienceList = ({ experience, deleteExperience }) => {
     
@@ -22,9 +23,9 @@ const ExperienceList = ({ experience, deleteExperience }) => {
                     }
                 </td>
                 <td className="hide-sm">
-                    <button className="btn btn-danger" onClick={() => deleteExperience(exp._id)}>
+                    <Button variant='contained' color='secondary' onClick={() => deleteExperience(exp._id)}>
                         Delete
-                    </button>
+                    </Button>
                 </td>
 
             </tr>

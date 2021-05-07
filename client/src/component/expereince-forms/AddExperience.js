@@ -1,11 +1,12 @@
 import React, { Fragment, useState } from 'react'
 import { Link, withRouter } from 'react-router-dom'
-import {addExperience} from '../../actions/profile.actions'
+import { addExperience } from '../../actions/profile.actions'
 import PropTypes from 'prop-types'
-import {connect} from 'react-redux'
+import { connect } from 'react-redux'
+import { Button, Checkbox, TextareaAutosize, TextField } from '@material-ui/core'
 
-const AddExperience = ({addExperience, history}) => {    
-    const [ experienceData, setExperienceData ] = useState({
+const AddExperience = ({ addExperience, history }) => {
+    const [experienceData, setExperienceData] = useState({
         title: '',
         company: '',
         location: '',
@@ -31,7 +32,7 @@ const AddExperience = ({addExperience, history}) => {
         })
     }
 
-    const [ toDateDisabled, setToDateDisabled ] = useState(false);
+    const [toDateDisabled, setToDateDisabled] = useState(false);
 
     const handleSubmit = event => {
         event.preventDefault();
@@ -50,43 +51,42 @@ const AddExperience = ({addExperience, history}) => {
             <small>* = required field</small>
             <form className="form">
                 <div className="form-group">
-                    <input type="text" placeholder="* Job Title" name="title" value={title} onChange={(e)=> handleChange(e)} required />
+                    <TextField variant='standard' type="text" label="* Job Title" name="title" value={title} onChange={(e) => handleChange(e)} required />
                 </div>
                 <div className="form-group">
-                    <input type="text" placeholder="* Company" name="company" value={company} onChange={(e)=> handleChange(e)} required />
+                    <TextField variant='standard' input type="text" label="* Company" name="company" value={company} onChange={(e) => handleChange(e)} required />
                 </div>
                 <div className="form-group">
-                    <input type="text" placeholder="Location" name="location" value={location} onChange={(e)=> handleChange(e)}/>
+                    <TextField variant='standard' type="text" label="Location" name="location" value={location} onChange={(e) => handleChange(e)} />
                 </div>
                 <div className="form-group">
                     <h4>*From Date</h4>
-                    <input type="date" name="from" value={from} onChange={(e)=> handleChange(e)}/>
+                    <TextField type="date" name="from" value={from} onChange={(e) => handleChange(e)} />
                 </div>
                 <div className="form-group">
-                    <p><input type="checkbox" name="current" value={current} checked={current} onChange={()=> {
+                    <p><Checkbox name="current" value={current} checked={current} onChange={() => {
                         setExperienceData({
                             ...experienceData,
-                            current : !current
+                            current: !current
                         })
                         setToDateDisabled(!toDateDisabled)
                     }} /> Current Job</p>
                 </div>
                 <div className="form-group">
                     <h4>To Date</h4>
-                    <input type="date" name="to" value={current ? '' : to} onChange={(e)=> handleChange(e)} disabled={toDateDisabled ? 'disabled' : null}/>
+                    <TextField type="date" name="to" value={current ? '' : to} onChange={(e) => handleChange(e)} disabled={toDateDisabled ? 'disabled' : null} />
                 </div>
                 <div className="form-group">
-                    <textarea
+                    <TextareaAutosize
+                        rowsMin={3}
                         name="description"
-                        cols="30"
-                        rows="5"
                         placeholder="Job Description"
-                        value={description} 
-                        onChange={(e)=> handleChange(e)}
-                    ></textarea>
+                        value={description}
+                        onChange={(e) => handleChange(e)}
+                    ></TextareaAutosize>
                 </div>
-                <input type="submit" className="btn btn-primary my-1" onClick={(e)=> handleSubmit(e)}/>
-                <Link className="btn btn-light my-1" to="/dashboard">Go Back</Link>
+                <Button variant='contained' color='primary' type="submit" onClick={(e) => handleSubmit(e)}>Save</Button>
+                <Button variant='contained' color='secondary'> <Link to="/dashboard" style={{'color': 'white'}}>Go Back</Link> </Button>
             </form>
         </Fragment>
     )
