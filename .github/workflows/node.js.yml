@@ -16,14 +16,15 @@ jobs:
       with:
         node-version: 18.x
         cache: 'npm'
-    - run: |
-        cd client  
+    - name: install and build client
+      run: |
         npm install 
         export NODE_OPTIONS=--openssl-legacy-provider
         CI=false npm run build
         ls -a 
     
   build-node:
+    needs: build-client
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
