@@ -1,25 +1,44 @@
-name: Node.js CI
+name: Node.js CI/CD
 
 on:
   push:
-    branches: [ "master" ]
+    branches: ["master", "pipelines"]
   pull_request:
-    branches: [ "master" ]
+    branches: ["master"]
 
 jobs:
-  build:
-
+  build-and-deploy:
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v4
-    - name: Use Node.js 16.x
-      uses: actions/setup-node@v4
-      with:
-        node-version: 16.x
-        cache: 'npm'
-    - run: |
-        cd client  
-        npm install 
-        npm run build --if-present
-        ls -a 
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Log in to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Build and Push Docker Image
+        id: build-image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: devnetwork-repository
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          echo "Building Docker image..."
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          echo "Pushing Docker image..."
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+
+      # - name: Update ECS Service
+      #   env:
+      #     AWS_REGION: your-aws-region                  # e.g., us-east-1
+      #     ECS_CLUSTER: your-ecs-cluster-name           # Replace with your ECS cluster name
+      #     ECS_SERVICE: your-ecs-service-name           # Replace with your ECS service name
+      #     IMAGE_URI: ${{ steps.build-image.outputs.image }}
+      #   run: |
+      #     echo "Updating ECS service..."
+      #     aws ecs update-service --cluster $ECS_CLUSTER --service $ECS_SERVICE --force-new-deployment --region $AWS_REGION
