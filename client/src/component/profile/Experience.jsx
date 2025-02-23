@@ -1,8 +1,8 @@
-import React, { Fragment } from 'react'
+import React from 'react'
 import Moment from 'react-moment'
 
 const Experience = ({ experience }) => {
-    return <Fragment>
+    return <div>
         <div className="profile-edu bg-white p-2">
             <h2 className="text-primary">Experience</h2>
             {
@@ -31,7 +31,7 @@ const Experience = ({ experience }) => {
                     })
             }
         </div>
-    </Fragment>
+    </div>
 }
 
 export default Experience;

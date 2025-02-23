@@ -11,7 +11,7 @@ import Comments from './Comments'
 const Post = ({ getPost, post: { post, isLoading }, match }) => {
     useEffect(() => {
         getPost(match.params.id);
-    }, [getPost]);
+    }, [getPost, match.params.id]);
     return isLoading || post === null ? <Spinner /> : <Fragment>
         <Link to="/posts" className='btn' > Back to Posts </Link>
         <PostItem post={post} showActions={false} />

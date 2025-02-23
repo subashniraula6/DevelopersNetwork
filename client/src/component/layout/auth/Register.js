@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from 'react'
+import React, { useState } from 'react'
 import { connect } from 'react-redux'
 import { setAlert } from '../../../actions/alert.actions'
 import PropTypes from 'prop-types'
@@ -12,7 +12,6 @@ import {
     Form,
     InputContainer,
 } from './Register.styles'
-import Grid from '@material-ui/core/Grid'
 import AccountCircle from '@material-ui/icons/AccountCircle'
 import { Lock, Email } from '@material-ui/icons'
 

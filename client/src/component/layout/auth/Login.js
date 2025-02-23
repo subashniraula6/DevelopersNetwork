@@ -1,10 +1,8 @@
-import React, { Fragment, useState } from 'react'
+import React, { useState } from 'react'
 import { Link, Redirect } from 'react-router-dom';
 import { loginUser } from '../../../actions/auth.actions'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
-import Button from '@material-ui/core/Button'
-import TextField from '@material-ui/core/TextField'
 import {
     Form,
     SigninContainer,

@@ -32,14 +32,14 @@ const ProfileTop = ({ profile: { user: { name, avatar },
                     
                     {
                         social && social.twitter &&
-                        <a href={social.twitter} target="_blank" rel="noopener noreferrer">
+                        <a href={social.twitter || '#'} target="_blank" rel="noopener noreferrer">
                             <i className="fab fa-twitter fa-2x"></i>
                         </a>
                     }
 
                     {
                         social && social.facebook &&
-                        <a href={social.facebook}>
+                        <a href={social.facebook || '#'}>
                             <i className="fab fa-facebook fa-2x"></i>
                         </a>
                     }
