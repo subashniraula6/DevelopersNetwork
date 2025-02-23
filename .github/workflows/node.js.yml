@@ -2,7 +2,7 @@ name: Node.js CI
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "master", "pipelines" ]
   pull_request:
     branches: [ "master" ]
 
@@ -13,10 +13,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - name: Use Node.js 16.x
+    - name: Use Node.js 18.x
       uses: actions/setup-node@v4
       with:
-        node-version: 16.x
+        node-version: 18.x
         cache: 'npm'
     - run: |
         cd client  
