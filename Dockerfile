@@ -11,9 +11,11 @@ RUN cd client && npm install --only=production
 
 COPY client/ ./client/
 
+RUN cd client 
+
 RUN export NODE_OPTIONS=--openssl-legacy-provider
 
-RUN cd client && CI=false npm run build
+RUN CI=false npm run build
 
 # Stage 2: Build the backend
 FROM node:18.20-alpine as runtime
