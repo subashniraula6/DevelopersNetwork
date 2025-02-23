@@ -2,37 +2,30 @@ name: Node.js CI
 
 on:
   push:
-    branches: [ "master", "pipelines" ]
+    branches: ["master", "pipelines"]
   pull_request:
-    branches: [ "master" ]
+    branches: ["master"]
 
 jobs:
-  build-client:
+  build-and-test:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    - name: Use Node.js 18.x
-      uses: actions/setup-node@v4
-      with:
-        node-version: 18.x
-        cache: 'npm'
-    - name: install and build client
-      run: |
-        npm install 
-        export NODE_OPTIONS=--openssl-legacy-provider
-        CI=false npm run build
-        ls -a 
-    
-  build-node:
-    needs: build-client
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    - name: Use Node.js 18.x
-      uses: actions/setup-node@v4
-      with:
-        node-version: 18.x
-        cache: 'npm'
-    - run: |
-        ls -a 
-        ls -a client
+      - uses: actions/checkout@v4
+      - name: Use Node.js 18.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18.x
+          cache: "npm"
+
+      - name: Install and Build Client
+        run: |
+          npm install
+          export NODE_OPTIONS=--openssl-legacy-provider
+          CI=false npm run build
+        working-directory: ./client
+
+      - name: Install and Run Node.js operations
+        run: |
+          ls -al
+          ls -al client
+          npm install
