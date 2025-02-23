@@ -21,4 +21,4 @@ jobs:
     - run: cd client
     - run: npm ci
     - run: npm run build --if-present
-    - run: ls client
+    - run: ls 
