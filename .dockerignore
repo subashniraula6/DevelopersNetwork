@@ -6,3 +6,4 @@ client/dist
 .github
 Dockerfile
 .gitignore
+.env
