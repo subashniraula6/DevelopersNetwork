@@ -34,3 +34,4 @@ jobs:
         cache: 'npm'
     - run: |
         ls -a 
+        ls -a client
