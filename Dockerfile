@@ -19,19 +19,12 @@ FROM node:18.20-alpine as runtime
 
 WORKDIR /app
 
-# Install production dependencies for the backend
 COPY package*.json ./
-RUN npm ci --only=production
 
-# Copy built client files from the builder stage
+RUN npm install --only=production
+
 COPY --from=builder /app/client/build ./client/build
 
-# Copy backend source code
-COPY server.js ./
-COPY other-backend-files/ ./  # Add other necessary files
-
-# Set runtime environment variables
-ENV NODE_ENV=production
 EXPOSE 5000
 
 CMD ["node", "server.js"]
