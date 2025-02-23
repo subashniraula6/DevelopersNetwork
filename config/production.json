@@ -1,6 +1,6 @@
 {
     "mongoURI" : "mongodb+srv://subash123:subash123@devconnector.hzeps.mongodb.net/<dbname>?retryWrites=true&w=majority",
-    "jwtSecret" : "mysecrettoken",
-    "githubClientId": "5a249e1159e8106475c9",
-    "githubSecret": "21bba5c754332024e9fc60e52e0d473313c01c4d"
+    "jwtSecret" : "asasas",
+    "githubClientId": "asasas",
+    "githubSecret": "asasas"
 }

@@ -7,7 +7,7 @@ const User = require('../../models/users_model')
 const Profile = require('../../models/profiles_model')
 
 const request = require('request')
-const config = require('config')
+const config = require('../../config')
 
 //@route Request-type='GET' End-point='api/profile/me'
 // @route    GET api/profile/me
