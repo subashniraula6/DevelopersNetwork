@@ -52,4 +52,6 @@ jobs:
 
       - name: Terraform Apply
         working-directory: ./ecs-terraform
-        run: terraform apply -auto-approve -var="container_image=${{ steps.build-image.outputs.image }}"
+        run: terraform apply -auto-approve \
+              -var="container_image=${{ steps.build-image.outputs.image }}" \
+              -var="env_config=${{ secrets.MY_CONFIG_JSON }}"
