@@ -46,7 +46,10 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
 
+      - name: Initialize Terraform
+        working-directory: ./ecs-terraform
+        run: terraform init
+
       - name: Terraform Apply
-        run: |
-          cd ecs-terraform
-          terraform apply -auto-approve -var="container_image=${{ steps.build-image.outputs.image }}"
+        working-directory: ./ecs-terraform
+        run: terraform apply -auto-approve -var="container_image=${{ steps.build-image.outputs.image }}"
