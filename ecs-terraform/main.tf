@@ -193,7 +193,7 @@ resource "aws_ecs_task_definition" "app" {
       hostPort      = 80,
       protocol      = "tcp"
     }],
-    environment  [
+    environment = [
       {
         name = "MY_CONFIG_JSON",
         value = var.env_config
