@@ -59,7 +59,7 @@ jobs:
           AWS_REGION: ${{ vars.AWS_REGION }}    
           ECS_CLUSTER: ${{ vars.ECS_CLUSTER }}       
           ECS_SERVICE: ${{ vars.ECS_SERVICE }}       
-          ECS_TASK_DEFINITION: ${{ ECS_TASK_DEFINITION }}  
+          ECS_TASK_DEFINITION: ${{ vars.ECS_TASK_DEFINITION }}  
           CONTAINER_NAME: ${{ vars.ECS_SERVICE }}     
         run: |
           echo "Fetching current task definition..."
