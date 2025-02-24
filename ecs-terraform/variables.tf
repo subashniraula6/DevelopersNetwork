@@ -64,5 +64,5 @@ variable "container_port" {
 
 variable "env_config" {
   type = string
-  default = "
+  default = ""
 }
