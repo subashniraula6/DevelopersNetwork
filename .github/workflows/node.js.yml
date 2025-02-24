@@ -42,52 +42,11 @@ jobs:
           echo "Pushing Docker image..."
           docker push $PUBLIC_ECR_REGISTRY/$REGISTRY_ID/$ECR_REPOSITORY:$IMAGE_TAG
           echo "::set-output name=image::$PUBLIC_ECR_REGISTRY/$REGISTRY_ID/$ECR_REPOSITORY:$IMAGE_TAG"
+      
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
 
-      - name: Update ECS Service
-        env:
-          AWS_REGION: ${{ vars.AWS_REGION }}                 
-          ECS_CLUSTER: ${{ vars.ECS_CLUSTER }}
-          ECS_SERVICE: ${{ vars.ECS_SERVICE }}         
-          IMAGE_URI: ${{ steps.build-image.outputs.image }}
+      - name: Terraform Apply
         run: |
-          echo "Updating ECS service..."
-          aws ecs update-service --cluster $ECS_CLUSTER --service $ECS_SERVICE --force-new-deployment --region $AWS_REGION
-
-      - name: Update ECS Task Definition
-        id: update-task-def
-        env:
-          AWS_REGION: ${{ vars.AWS_REGION }}    
-          ECS_CLUSTER: ${{ vars.ECS_CLUSTER }}       
-          ECS_SERVICE: ${{ vars.ECS_SERVICE }}       
-          ECS_TASK_DEFINITION: ${{ vars.ECS_TASK_DEFINITION }}  
-          CONTAINER_NAME: ${{ vars.ECS_SERVICE }}     
-        run: |
-          echo "Fetching current task definition..."
-          TASK_DEF_JSON=$(aws ecs describe-task-definition --task-definition $ECS_TASK_DEFINITION --query taskDefinition | jq 'del(.taskDefinitionArn, .revision, .status, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy)')
-          
-          echo "Updating image in task definition..."
-          NEW_TASK_DEF_JSON=$(echo $TASK_DEF_JSON | jq --arg IMAGE_URI "$image" '.containerDefinitions[0].image=$IMAGE_URI')
-
-          echo "Registering new task definition..."
-          NEW_TASK_DEF_ARN=$(echo $NEW_TASK_DEF_JSON | aws ecs register-task-definition --cli-input-json file://<(echo "$NEW_TASK_DEF_JSON") | jq -r '.taskDefinition.taskDefinitionArn')
-          
-          echo "New Task Definition ARN: $NEW_TASK_DEF_ARN"
-          echo "task_def_arn=$NEW_TASK_DEF_ARN" >> $GITHUB_ENV
-
-      - name: Deploy to ECS
-        env:
-          AWS_REGION: ${{ vars.AWS_REGION }}
-          ECS_CLUSTER: ${{ vars.ECS_CLUSTER }}
-          ECS_SERVICE: ${{ vars.ECS_SERVICE }}
-        run: |
-          echo "Updating ECS service..."
-          aws ecs update-service --cluster $ECS_CLUSTER --service $ECS_SERVICE --task-definition $task_def_arn --force-new-deployment --region $AWS_REGION
-
-      - name: Wait for ECS Service to Stabilize
-        env:
-          AWS_REGION: ${{ vars.AWS_REGION }}
-          ECS_CLUSTER: ${{ vars.ECS_CLUSTER }}
-          ECS_SERVICE: ${{ vars.ECS_SERVICE }}
-        run: |
-          echo "Waiting for ECS deployment to complete..."
-          aws ecs wait services-stable --cluster $ECS_CLUSTER --services $ECS_SERVICE --region $AWS_REGION
+          cd ecs-terraform
+          terraform apply -auto-approve -var="container_image=${{ steps.build-image.outputs.image }}"
