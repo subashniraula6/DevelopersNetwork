@@ -179,8 +179,8 @@ resource "aws_ecs_task_definition" "app" {
   family                   = "app-task"
   network_mode             = "bridge"
   requires_compatibilities = ["EC2"]
-  cpu                      = 256  # 1/4 vCPU (256 CPU units)
-  memory                   = 512  # 512MB
+  cpu                      = 256
+  memory                   = 512
 
   container_definitions = jsonencode([{
     name      = "app-container",
@@ -192,8 +192,28 @@ resource "aws_ecs_task_definition" "app" {
       containerPort = var.container_port,
       hostPort      = 80,
       protocol      = "tcp"
-    }]
+    }],
+    environment  [
+      {
+        name = "MY_CONFIG_JSON",
+        value = var.env_config
+      }
+    ],
+    logConfiguration = {
+      logDriver = "awslogs",
+      options = {
+        "awslogs-group"         = "/ecs/app-task",
+        "awslogs-region"       = var.aws_region,
+        "awslogs-stream-prefix" = "ecs"
+      }
+    }
   }])
+}
+
+# Create a CloudWatch Log Group for ECS logs
+resource "aws_cloudwatch_log_group" "ecs_logs" {
+  name              = "/ecs/app-task"
+  retention_in_days = 7  # Adjust retention as needed
 }
 
 #############################

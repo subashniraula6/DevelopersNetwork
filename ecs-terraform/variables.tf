@@ -59,5 +59,10 @@ variable "container_image" {
 
 variable "container_port" {
   description = "Port on which the container listens"
-  default     = 80
+  default     = 5000
+}
+
+variable "env_config" {
+  type = string
+  default = "
 }
