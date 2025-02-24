@@ -170,3 +170,49 @@ resource "aws_ecs_cluster_capacity_providers" "cluster_capacity_providers" {
 resource "aws_ecrpublic_repository" "app" {
   repository_name = var.ecr_repository_name
 }
+
+#############################
+# ECS Task Definition
+#############################
+
+resource "aws_ecs_task_definition" "app" {
+  family                   = "app-task"
+  network_mode             = "bridge"
+  requires_compatibilities = ["EC2"]
+  cpu                      = 256  # 1/4 vCPU (256 CPU units)
+  memory                   = 512  # 512MB
+
+  container_definitions = jsonencode([{
+    name      = "app-container",
+    image     = var.container_image,
+    cpu       = 256,
+    memory    = 512,
+    essential = true,
+    portMappings = [{
+      containerPort = var.container_port,
+      hostPort      = 80,
+      protocol      = "tcp"
+    }]
+  }])
+}
+
+#############################
+# ECS Service
+#############################
+
+resource "aws_ecs_service" "app" {
+  name            = "devnetwork-service"
+  cluster         = aws_ecs_cluster.main.id
+  task_definition = aws_ecs_task_definition.app.arn
+  desired_count   = 1
+
+  capacity_provider_strategy {
+    capacity_provider = aws_ecs_capacity_provider.asg_capacity_provider.name
+    weight            = 1
+  }
+
+  # Allow external changes without Terraform conflicts
+  lifecycle {
+    ignore_changes = [task_definition, desired_count]
+  }
+}

@@ -51,3 +51,13 @@ variable "ecr_repository_name" {
   type        = string
   default     = "devnetwork-repository"
 }
+
+variable "container_image" {
+  description = "Docker image for the container"
+  default     = "nginx:latest"
+}
+
+variable "container_port" {
+  description = "Port on which the container listens"
+  default     = 80
+}
