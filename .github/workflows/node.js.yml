@@ -29,19 +29,34 @@ jobs:
         with:
           registry-type: public
 
+      - name: Create Public ECR Repository if Not Exists
+        env:
+          AWS_REGION: ${{ vars.AWS_REGION }}
+          ECR_REPOSITORY: devnetwork-repository
+        run: |
+          echo "Checking if ECR public repository exists..."
+          if ! aws ecr-public describe-repositories --region $AWS_REGION --repository-names $ECR_REPOSITORY > /dev/null 2>&1; then
+            echo "ECR public repository does not exist. Creating..."
+            aws ecr-public create-repository --repository-name $ECR_REPOSITORY --region $AWS_REGION
+          else
+            echo "ECR public repository already exists."
+          fi
+
       - name: Build and Push Docker Image
         id: build-image
         env:
-          PUBLIC_ECR_REGISTRY: public.ecr.aws
-          REGISTRY_ID: w1u7z6i9
+          AWS_REGION: ${{ vars.AWS_REGION }}
           ECR_REPOSITORY: devnetwork-repository
           IMAGE_TAG: ${{ github.sha }}
         run: |
+          echo "Retrieving dynamic REGISTRY_ID..."
+          REGISTRY_URI=$(aws ecr-public describe-registries --region $AWS_REGION --query 'registries[0].registryUri' --output text)
+          echo "Using registry Uri: $REGISTRY_URI"
           echo "Building Docker image..."
-          docker build -t $PUBLIC_ECR_REGISTRY/$REGISTRY_ID/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker build -t $REGISTRY_URI/$ECR_REPOSITORY:$IMAGE_TAG .
           echo "Pushing Docker image..."
-          docker push $PUBLIC_ECR_REGISTRY/$REGISTRY_ID/$ECR_REPOSITORY:$IMAGE_TAG
-          echo "::set-output name=image::$PUBLIC_ECR_REGISTRY/$REGISTRY_ID/$ECR_REPOSITORY:$IMAGE_TAG"
+          docker push $REGISTRY_URI/$ECR_REPOSITORY:$IMAGE_TAG
+          echo "::set-output name=image::$REGISTRY_URI/$ECR_REPOSITORY:$IMAGE_TAG"
       
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
