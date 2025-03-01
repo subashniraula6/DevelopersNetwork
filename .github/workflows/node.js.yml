@@ -46,15 +46,19 @@ jobs:
         id: build-image
         env:
           PUBLIC_ECR_REGISTRY: public.ecr.aws
-          REGISTRY_ID: w1u7z6i9
+          AWS_REGION: ${{ vars.AWS_REGION }}
           ECR_REPOSITORY: devnetwork-repository
           IMAGE_TAG: ${{ github.sha }}
         run: |
+          echo "Retrieving dynamic REGISTRY_ID..."
+          REGISTRY_ID=$(aws ecr-public describe-registries --region $AWS_REGION --query 'registries[0].registryId' --output text)
+          echo "Using registry id: $REGISTRY_ID"
           echo "Building Docker image..."
           docker build -t $PUBLIC_ECR_REGISTRY/$REGISTRY_ID/$ECR_REPOSITORY:$IMAGE_TAG .
           echo "Pushing Docker image..."
           docker push $PUBLIC_ECR_REGISTRY/$REGISTRY_ID/$ECR_REPOSITORY:$IMAGE_TAG
           echo "::set-output name=image::$PUBLIC_ECR_REGISTRY/$REGISTRY_ID/$ECR_REPOSITORY:$IMAGE_TAG"
+
       
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
