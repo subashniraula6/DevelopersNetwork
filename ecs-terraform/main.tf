@@ -5,6 +5,11 @@ terraform {
       version = "~> 5.0"
     }
   }
+  backend "s3" {
+    bucket = "devnetwork-tfstate"
+    key    = "terraform.tfstate"
+    region = var.aws_region
+  }
 }
 
 provider "aws" {
@@ -198,7 +203,7 @@ resource "aws_ecs_task_definition" "app" {
         name = "MY_CONFIG_JSON",
         value = var.env_config
       }
-    ],
+    ],            
     logConfiguration = {
       logDriver = "awslogs",
       options = {
