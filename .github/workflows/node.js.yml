@@ -29,6 +29,19 @@ jobs:
         with:
           registry-type: public
 
+      - name: Create ECR Repository if Not Exists
+        env:
+          AWS_REGION: ${{ vars.AWS_REGION }}
+          ECR_REPOSITORY: devnetwork-repository
+        run: |
+          echo "Checking if ECR repository exists..."
+          if ! aws ecr describe-repositories --region $AWS_REGION --repository-names $ECR_REPOSITORY > /dev/null 2>&1; then
+            echo "ECR repository does not exist. Creating..."
+            aws ecr create-repository --repository-name $ECR_REPOSITORY --region $AWS_REGION
+          else
+            echo "ECR repository already exists."
+          fi
+
       - name: Build and Push Docker Image
         id: build-image
         env:
