@@ -8,7 +8,7 @@ on:
 env:
   AWS_REGION: ${{ vars.AWS_REGION }}
   ECR_REPOSITORY_NAME: devnetwork-repository
-  ECS_CLUSTER_NAME: devnetwork-ecs-cluster 
+  ECS_CLUSTER_NAME: devnetworkk-ecs-cluster 
   ECS_SERVICE_NAME: devnetwork-ecs-service
   CONTAINER_NAME: devnetwork-node-container
   TASK_CPU: 256
