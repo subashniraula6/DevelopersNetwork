@@ -79,19 +79,19 @@ jobs:
                   },
                   {
                     "name": "MONGO_URI",
-                    "value": $MONGO_URI
+                    "value": "$MONGO_URI"
                   },
                   {
                     "name": "JWT_SECRET",
-                    "value": $JWT_SECRET
+                    "value": "$JWT_SECRET"
                   },
                   {
                     "name": "GIT_HUB_CLIENT_ID",
-                    "value": $GIT_HUB_CLIENT_ID
+                    "value": "$GIT_HUB_CLIENT_ID"
                   },
                   {
                     "name": "GIT_HUB_SECRET",
-                    "value": $GIT_HUB_SECRET
+                    "value": "$GIT_HUB_SECRET"
                   }
                 ],
                 "portMappings": [
@@ -109,6 +109,7 @@ jobs:
           EOF
           )
           echo "$TASK_DEFINITION" > task_definition.json
+          cat task_definition.json | jq .
           aws ecs register-task-definition --cli-input-json file://task_definition.json
 
       - name: Create or Update ECS Cluster
