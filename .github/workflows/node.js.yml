@@ -120,6 +120,21 @@ jobs:
             aws ecs create-cluster --cluster-name ${{ env.ECS_CLUSTER_NAME }}
           fi
 
+      - name: Launch ECS Container Instance
+        run: |
+          # Create a user data script that sets the ECS cluster name
+          echo '#!/bin/bash' > ecs-user-data.txt
+          echo 'echo ECS_CLUSTER=${{ env.ECS_CLUSTER_NAME }} >> /etc/ecs/ecs.config' >> ecs-user-data.txt
+          # Launch an EC2 instance using the ECS-optimized AMI (example AMI for us-east-1)
+          aws ec2 run-instances \
+            --image-id ami-05b10e08d247fb927 \
+            --count 1 \
+            --instance-type t2.micro \
+            --iam-instance-profile Name="ecsInstanceRole" \
+            --user-data file://ecs-user-data.txt \
+            --subnet-id ${{ env.SUBNET_ID }} \
+            --security-group-ids ${{ env.SECURITY_GROUP_ID }}
+
       - name: Create or Update ECS Service
         env:
           IMAGE_URI: ${{ env.IMAGE_URI }}
