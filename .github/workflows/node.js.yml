@@ -9,6 +9,7 @@ env:
   AWS_REGION: ${{ vars.AWS_REGION }}
   ECR_REPOSITORY: devnetwork-repo
   ECS_CLUSTER: devnetwork-cluster 
+  TASK_DEFINITION_FAMILY: devnetwork-task
   ECS_SERVICE: devnetwork-service
   CONTAINER_NAME: "app"
 
@@ -45,7 +46,7 @@ jobs:
       - name: Update ECS Task Definition
         run: |
           # Get current task definition
-          TASK_DEFINITION=$(aws ecs describe-task-definition --task-definition $ECS_SERVICE)
+          TASK_DEFINITION=$(aws ecs describe-task-definition --task-definition $TASK_DEFINITION_FAMILY)
           
           # Update container image
           NEW_DEFINITION=$(echo "$TASK_DEFINITION" | jq \
