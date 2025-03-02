@@ -14,7 +14,7 @@ env:
   TASK_CPU: 256
   TASK_MEMORY: 512
   CONTAINER_PORT: 5000
-  SUBNET_ID: subnet-0ca749830ea3bdfd1
+  SUBNET_ID: subnet-00c694cbcfa0d0a6e
   SECURITY_GROUP_ID: sg-0b247670d4a78a6ae
   MONGO_URI: ${{ secrets.MONGO_URI }}
   JWT_SECRET: ${{ secrets.JWT_SECRET }}
