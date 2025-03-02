@@ -38,6 +38,12 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
+      # 💡 Create required IAM role
+      - name: Setup ECS Instance Role
+        run: |
+          aws iam create-role --role-name ecsInstanceRole --assume-role-policy-document '{"Version":"2012-10-17","Statement":[{"Effect":"Allow","Principal":{"Service":"ec2.amazonaws.com"},"Action":"sts:AssumeRole"}]}' || true
+          aws iam attach-role-policy --role-name ecsInstanceRole --policy-arn arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role
+
       - name: Create ECR Repository (if not exists)
         run: |
           aws ecr describe-repositories --repository-names ${{ env.ECR_REPOSITORY_NAME }} || \
@@ -120,20 +126,51 @@ jobs:
             aws ecs create-cluster --cluster-name ${{ env.ECS_CLUSTER_NAME }}
           fi
 
-      - name: Launch ECS Container Instance
+      # - name: Launch ECS Container Instance
+      #   run: |
+      #     # Create a user data script that sets the ECS cluster name
+      #     echo '#!/bin/bash' > ecs-user-data.txt
+      #     echo 'echo ECS_CLUSTER=${{ env.ECS_CLUSTER_NAME }} >> /etc/ecs/ecs.config' >> ecs-user-data.txt
+      #     # Launch an EC2 instance using the ECS-optimized AMI (example AMI for us-east-1)
+      #     aws ec2 run-instances \
+      #       --image-id ami-05b10e08d247fb927 \
+      #       --count 1 \
+      #       --instance-type t2.micro \
+      #       --iam-instance-profile Name="ecsInstanceRole" \
+      #       --user-data file://ecs-user-data.txt \
+      #       --subnet-id ${{ env.SUBNET_ID }} \
+      #       --security-group-ids ${{ env.SECURITY_GROUP_ID }}
+            
+      - name: Launch EC2 Instance with Retry
         run: |
-          # Create a user data script that sets the ECS cluster name
-          echo '#!/bin/bash' > ecs-user-data.txt
-          echo 'echo ECS_CLUSTER=${{ env.ECS_CLUSTER_NAME }} >> /etc/ecs/ecs.config' >> ecs-user-data.txt
-          # Launch an EC2 instance using the ECS-optimized AMI (example AMI for us-east-1)
+          # 💡 Improved user data with ECS agent start
+          cat <<EOF > user-data.txt
+          #!/bin/bash
+          echo ECS_CLUSTER=${{ env.ECS_CLUSTER_NAME }} >> /etc/ecs/ecs.config
+          systemctl enable --now ecs
+          EOF
+          
           aws ec2 run-instances \
             --image-id ami-05b10e08d247fb927 \
             --count 1 \
             --instance-type t2.micro \
             --iam-instance-profile Name="ecsInstanceRole" \
-            --user-data file://ecs-user-data.txt \
+            --user-data file://user-data.txt \
             --subnet-id ${{ env.SUBNET_ID }} \
             --security-group-ids ${{ env.SECURITY_GROUP_ID }}
+
+      # 💡 Critical wait added here
+      - name: Wait for Instance Registration
+        run: |
+          echo "Waiting for EC2 instance to register with cluster..."
+          for i in {1..10}; do
+            INSTANCE_COUNT=$(aws ecs list-container-instances \
+              --cluster ${{ env.ECS_CLUSTER_NAME }} \
+              --query 'length(containerInstanceArns)' \
+              --output text)
+            [ "$INSTANCE_COUNT" -ge 1 ] && break
+            sleep 30
+          done
 
       - name: Create or Update ECS Service
         env:
