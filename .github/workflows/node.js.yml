@@ -2,7 +2,7 @@ name: Node.js CI/CD
 
 on:
   push:
-    branches: ["master", "pipelines"]
+    branches: ["master", "pipelines", "new-pipeline"]
   pull_request:
     branches: ["master"]
 env:
