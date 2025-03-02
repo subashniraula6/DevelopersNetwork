@@ -38,17 +38,24 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
-      # 💡 Create required IAM role
       - name: Setup ECS Instance Role
         run: |
-          aws iam create-role --role-name ecsInstanceRole --assume-role-policy-document '{"Version":"2012-10-17","Statement":[{"Effect":"Allow","Principal":{"Service":"ec2.amazonaws.com"},"Action":"sts:AssumeRole"}]}' || true
-          aws iam attach-role-policy --role-name ecsInstanceRole --policy-arn arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role
-
-      - name: Create ECR Repository (if not exists)
-        run: |
-          aws ecr describe-repositories --repository-names ${{ env.ECR_REPOSITORY_NAME }} || \
-          aws ecr create-repository --repository-name ${{ env.ECR_REPOSITORY_NAME }}
-
+          # Create role and instance profile
+          aws iam create-role \
+            --role-name ecsInstanceRole \
+            --assume-role-policy-document '{"Version":"2012-10-17","Statement":[{"Effect":"Allow","Principal":{"Service":"ec2.amazonaws.com"},"Action":"sts:AssumeRole"}]}' || true
+          
+          aws iam create-instance-profile \
+            --instance-profile-name ecsInstanceProfile || true
+          
+          aws iam add-role-to-instance-profile \
+            --instance-profile-name ecsInstanceProfile \
+            --role-name ecsInstanceRole || true
+          
+          aws iam attach-role-policy \
+            --role-name ecsInstanceRole \
+            --policy-arn arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role
+      
       - name: Log in to Amazon ECR Public
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
@@ -159,35 +166,59 @@ jobs:
             --subnet-id ${{ env.SUBNET_ID }} \
             --security-group-ids ${{ env.SECURITY_GROUP_ID }}
 
-      # 💡 Critical wait added here
       - name: Wait for Instance Registration
         run: |
-          echo "Waiting for EC2 instance to register with cluster..."
-          for i in {1..10}; do
+          echo "Waiting for EC2 instance registration..."
+          timeout=600  # 10 minutes max wait
+          interval=30
+          while [ $timeout -gt 0 ]; do
             INSTANCE_COUNT=$(aws ecs list-container-instances \
               --cluster ${{ env.ECS_CLUSTER_NAME }} \
               --query 'length(containerInstanceArns)' \
               --output text)
-            [ "$INSTANCE_COUNT" -ge 1 ] && break
-            sleep 30
+            
+            if [ "$INSTANCE_COUNT" -ge 1 ]; then
+              echo "Instance registered successfully!"
+              exit 0
+            fi
+            
+            sleep $interval
+            timeout=$((timeout - interval))
+            echo "Remaining wait time: $timeout seconds"
           done
+          
+          echo "::error::Timeout: EC2 instance failed to register with ECS cluster"
+          exit 1
 
+      # ▼▼▼ Replace your current "Create or Update ECS Service" step with this ▼▼▼
       - name: Create or Update ECS Service
-        env:
-          IMAGE_URI: ${{ env.IMAGE_URI }}
         run: |
-          SERVICE_ARN=$(aws ecs describe-services --cluster ${{ env.ECS_CLUSTER_NAME }} --services ${{ env.ECS_SERVICE_NAME }} --query 'services[0].serviceArn' --output text)
+          # Get latest task definition ARN
+          TASK_DEF_ARN=$(aws ecs describe-task-definition \
+            --task-definition ${{ env.ECS_SERVICE_NAME }} \
+            --query 'taskDefinition.taskDefinitionArn' \
+            --output text)
+          
+          # Check if service exists
+          SERVICE_ARN=$(aws ecs describe-services \
+            --cluster ${{ env.ECS_CLUSTER_NAME }} \
+            --services ${{ env.ECS_SERVICE_NAME }} \
+            --query 'services[0].serviceArn' \
+            --output text)
+          
           if [ "$SERVICE_ARN" = "None" ]; then
+            echo "Creating new ECS service..."
             aws ecs create-service \
               --cluster ${{ env.ECS_CLUSTER_NAME }} \
               --service-name ${{ env.ECS_SERVICE_NAME }} \
-              --task-definition ${{ env.ECS_SERVICE_NAME }} \
+              --task-definition "$TASK_DEF_ARN" \
               --desired-count 1 \
               --launch-type EC2
           else
+            echo "Updating existing ECS service..."
             aws ecs update-service \
               --cluster ${{ env.ECS_CLUSTER_NAME }} \
               --service ${{ env.ECS_SERVICE_NAME }} \
-              --force-new-deployment \
-              --task-definition ${{ env.ECS_SERVICE_NAME }}
+              --task-definition "$TASK_DEF_ARN" \
+              --force-new-deployment
           fi
