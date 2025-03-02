@@ -147,47 +147,80 @@ jobs:
       #       --user-data file://ecs-user-data.txt \
       #       --subnet-id ${{ env.SUBNET_ID }} \
       #       --security-group-ids ${{ env.SECURITY_GROUP_ID }}
+      - name: Validate Networking
+        run: |
+          # Check subnet is public
+          SUBNET_PUBLIC=$(aws ec2 describe-subnets \
+            --subnet-ids ${{ env.SUBNET_ID }} \
+            --query 'Subnets[0].MapPublicIpOnLaunch' \
+            --output text)
+          
+          if [ "$SUBNET_PUBLIC" = "False" ]; then
+            echo "::error::Subnet must be public (MapPublicIpOnLaunch=true)"
+            exit 1
+          fi
+      
+      - name: Verify Security Group
+        run: |
+          aws ec2 describe-security-groups \
+            --group-ids ${{ env.SECURITY_GROUP_ID }} \
+            --query 'SecurityGroups[0].IpPermissions' \
+            --output table  
             
       - name: Launch EC2 Instance with Retry
         run: |
-          # 💡 Improved user data with ECS agent start
           cat <<EOF > user-data.txt
           #!/bin/bash
           echo ECS_CLUSTER=${{ env.ECS_CLUSTER_NAME }} >> /etc/ecs/ecs.config
-          systemctl enable --now ecs
+          yum install -y ecs-init
+          service ecs start
+          systemctl enable ecs
           EOF
           
           aws ec2 run-instances \
             --image-id ami-05b10e08d247fb927 \
             --count 1 \
             --instance-type t2.micro \
-            --iam-instance-profile Name="ecsInstanceRole" \
+            --iam-instance-profile Name="ecsInstanceProfile" \
             --user-data file://user-data.txt \
             --subnet-id ${{ env.SUBNET_ID }} \
-            --security-group-ids ${{ env.SECURITY_GROUP_ID }}
+            --security-group-ids ${{ env.SECURITY_GROUP_ID }} \
+            --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=CI-CD-Instance}]'
 
       - name: Wait for Instance Registration
+        timeout-minutes: 10  # Hard timeout for GitHub Actions
         run: |
-          echo "Waiting for EC2 instance registration..."
-          timeout=600  # 10 minutes max wait
-          interval=30
-          while [ $timeout -gt 0 ]; do
+          echo "Starting instance registration check..."
+          end_time=$(( $(date +%s) + 600 ))  # 10-minute timeout
+          
+          while [ $(date +%s) -lt $end_time ]; do
             INSTANCE_COUNT=$(aws ecs list-container-instances \
               --cluster ${{ env.ECS_CLUSTER_NAME }} \
               --query 'length(containerInstanceArns)' \
               --output text)
+            
+            echo "Current registered instances: $INSTANCE_COUNT"
             
             if [ "$INSTANCE_COUNT" -ge 1 ]; then
               echo "Instance registered successfully!"
               exit 0
             fi
             
-            sleep $interval
-            timeout=$((timeout - interval))
-            echo "Remaining wait time: $timeout seconds"
+            # Check EC2 instance status
+            INSTANCE_ID=$(aws ec2 describe-instances \
+              --filters "Name=instance-type,Values=t2.micro" "Name=instance-state-name,Values=running" \
+              --query 'Reservations[0].Instances[0].InstanceId' \
+              --output text)
+            
+            if [ "$INSTANCE_ID" = "None" ]; then
+              echo "::error::EC2 instance failed to start"
+              exit 1
+            fi
+            
+            sleep 30
           done
           
-          echo "::error::Timeout: EC2 instance failed to register with ECS cluster"
+          echo "::error::Timeout: Instance never registered with ECS cluster"
           exit 1
 
       # ▼▼▼ Replace your current "Create or Update ECS Service" step with this ▼▼▼
