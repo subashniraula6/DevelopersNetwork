@@ -7,15 +7,10 @@ on:
     branches: ["master"]
 env:
   AWS_REGION: ${{ vars.AWS_REGION }}
-  ECR_REPOSITORY_NAME: devnetwork-repository
-  ECS_CLUSTER_NAME: devnetwork-ecs-cluster 
-  ECS_SERVICE_NAME: devnetwork-ecs-service
-  CONTAINER_NAME: devnetwork-node-container
-  TASK_CPU: 256
-  TASK_MEMORY: 512
-  CONTAINER_PORT: 5000
-  SUBNET_ID: subnet-0ca749830ea3bdfd1
-  SECURITY_GROUP_ID: sg-0b247670d4a78a6ae
+  ECR_REPOSITORY: devnetwork-repo
+  ECS_CLUSTER: devnetwork-cluster 
+  ECS_SERVICE: devnetwork-service
+  CONTAINER_NAME: "app"
 
 jobs:
   build-and-deploy:
@@ -32,14 +27,9 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
+          aws-region: ${{ env.AWS_REGION }}
 
-      - name: Create ECR Repository (if not exists)
-        run: |
-          aws ecr describe-repositories --repository-names ${{ env.ECR_REPOSITORY_NAME }} || \
-          aws ecr create-repository --repository-name ${{ env.ECR_REPOSITORY_NAME }}
-
-      - name: Log in to Amazon ECR Public
+      - name: Log in to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
@@ -48,75 +38,30 @@ jobs:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          docker build -t $ECR_REGISTRY/${{ env.ECR_REPOSITORY_NAME }}:$IMAGE_TAG .
-          docker push $ECR_REGISTRY/${{ env.ECR_REPOSITORY_NAME }}:$IMAGE_TAG
-          echo "IMAGE_URI=$ECR_REGISTRY/${{ env.ECR_REPOSITORY_NAME }}:$IMAGE_TAG" >> $GITHUB_ENV
+          docker build -t $ECR_REGISTRY/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG
+          echo "IMAGE_URI=$ECR_REGISTRY/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG" >> $GITHUB_ENV
      
-      - name: Register ECS Task Definition
-        id: register-task-def
-        env:
-          IMAGE_URI: ${{ env.IMAGE_URI }}
+      - name: Update ECS Task Definition
         run: |
-          TASK_DEFINITION=$(cat <<EOF
-          {
-            "family": "${{ env.ECS_SERVICE_NAME }}",
-            "networkMode": "bridge",
-            "containerDefinitions": [
-              {
-                "name": "${{ env.CONTAINER_NAME }}",
-                "image": "$IMAGE_URI",
-                "essential": true,
-                "memory": ${{ env.TASK_MEMORY }},
-                "cpu": ${{ env.TASK_CPU }},
-                "environment": [
-                  {
-                    "name": "NODE_ENV",
-                    "value": "production"
-                  },
-                  {
-                    "name": "MY_CONFIG_JSON",
-                    "value": ${{ secrets.MY_CONFIG_JSON }}
-                  }
-                ],
-                "portMappings": [
-                  {
-                    "containerPort": ${{ env.CONTAINER_PORT }},
-                    "hostPort": ${{ env.CONTAINER_PORT }}
-                  }
-                ]
-              }
-            ],
-            "requiresCompatibilities": ["EC2"],
-            "cpu": "${{ env.TASK_CPU }}",
-            "memory": "${{ env.TASK_MEMORY }}"
-          }
-          EOF
-          )
-          echo "$TASK_DEFINITION" > task_definition.json
-          aws ecs register-task-definition --cli-input-json file://task_definition.json
+          # Get current task definition
+          TASK_DEFINITION=$(aws ecs describe-task-definition --task-definition $ECS_SERVICE)
+          
+          # Update container image
+          NEW_DEFINITION=$(echo "$TASK_DEFINITION" | jq \
+            --arg IMAGE_URI "${{ env.IMAGE_URI }}" \
+            --arg CONTAINER_NAME "${{ env.CONTAINER_NAME }}" \
+            '.taskDefinition | 
+            del(.status, .taskDefinitionArn, .requiresAttributes, .revision, .registeredAt, .registeredBy, .compatibilities) |
+            .containerDefinitions[0].image = $IMAGE_URI')
+          
+          # Register new task definition
+          echo "$NEW_DEFINITION" > new_task_definition.json
+          aws ecs register-task-definition --cli-input-json file://new_task_definition.json
 
-      - name: Create or Update ECS Cluster
+      - name: Force ECS Service Update
         run: |
-          aws ecs describe-clusters --clusters ${{ env.ECS_CLUSTER_NAME }} || \
-          aws ecs create-cluster --cluster-name ${{ env.ECS_CLUSTER_NAME }}
-
-      - name: Create or Update ECS Service
-        env:
-          IMAGE_URI: ${{ env.IMAGE_URI }}
-        run: |
-          SERVICE_ARN=$(aws ecs describe-services --cluster ${{ env.ECS_CLUSTER_NAME }} --services ${{ env.ECS_SERVICE_NAME }} --query 'services[0].serviceArn' --output text)
-          if [ "$SERVICE_ARN" = "None" ]; then
-            aws ecs create-service \
-              --cluster ${{ env.ECS_CLUSTER_NAME }} \
-              --service-name ${{ env.ECS_SERVICE_NAME }} \
-              --task-definition ${{ env.ECS_SERVICE_NAME }} \
-              --desired-count 1 \
-              --launch-type EC2 \
-              --network-configuration "awsvpcConfiguration={subnets=[$SUBNET_ID],securityGroups=[$SECURITY_GROUP_ID],assignPublicIp=ENABLED}"
-          else
-            aws ecs update-service \
-              --cluster ${{ env.ECS_CLUSTER_NAME }} \
-              --service ${{ env.ECS_SERVICE_NAME }} \
-              --force-new-deployment \
-              --task-definition ${{ env.ECS_SERVICE_NAME }}
-          fi
+          aws ecs update-service \
+            --cluster $ECS_CLUSTER \
+            --service $ECS_SERVICE \
+            --force-new-deployment
