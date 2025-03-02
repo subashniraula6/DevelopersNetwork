@@ -5,8 +5,8 @@ let config = {};
 function loadConfigFromEnv() {
   const mongoURI = process.env.MONGO_URI;
   const jwtSecret = process.env.JWT_SECRET;
-  const githubClientId = process.env.GITHUB_CLIENT_ID;
-  const githubSecret = process.env.GITHUB_SECRET;
+  const githubClientId = process.env.GIT_HUB_CLIENT_ID;
+  const githubSecret = process.env.GIT_HUB_SECRET;
 
   if (mongoURI && jwtSecret && githubClientId && githubSecret) {
     config = {
