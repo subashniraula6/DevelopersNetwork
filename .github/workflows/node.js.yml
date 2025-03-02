@@ -114,8 +114,11 @@ jobs:
 
       - name: Create or Update ECS Cluster
         run: |
-          aws ecs describe-clusters --clusters ${{ env.ECS_CLUSTER_NAME }} || \
-          aws ecs create-cluster --cluster-name ${{ env.ECS_CLUSTER_NAME }}
+          CLUSTER_STATUS=$(aws ecs describe-clusters --clusters ${{ env.ECS_CLUSTER_NAME }} \
+          --query "clusters[0].status" --output text)
+          if [ "$CLUSTER_STATUS" != "ACTIVE" ]; then
+            aws ecs create-cluster --cluster-name ${{ env.ECS_CLUSTER_NAME }}
+          fi
 
       - name: Create or Update ECS Service
         env:
