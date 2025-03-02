@@ -131,8 +131,7 @@ jobs:
               --service-name ${{ env.ECS_SERVICE_NAME }} \
               --task-definition ${{ env.ECS_SERVICE_NAME }} \
               --desired-count 1 \
-              --launch-type EC2 \
-              --network-configuration "awsvpcConfiguration={subnets=[$SUBNET_ID],securityGroups=[$SECURITY_GROUP_ID],assignPublicIp=ENABLED}"
+              --launch-type EC2
           else
             aws ecs update-service \
               --cluster ${{ env.ECS_CLUSTER_NAME }} \
