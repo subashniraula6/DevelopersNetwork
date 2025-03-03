@@ -67,7 +67,6 @@ jobs:
       #       --service $ECS_SERVICE \
       #       --force-new-deployment
 
-      - name: Update ECS Ser
       - name: Update ECS Task Definition
         run: |
           # Get current task definition
