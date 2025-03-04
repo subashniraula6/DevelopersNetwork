@@ -58,3 +58,9 @@ variable "github_secret" {
   type        = string
   sensitive   = true
 }
+
+variable "image_tag" {
+  description = "Docker image tag to deploy"
+  type        = string
+  default     = "latest"  # Default for local development
+}

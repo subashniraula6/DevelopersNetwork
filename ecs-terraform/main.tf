@@ -107,7 +107,7 @@ resource "aws_ecs_task_definition" "app" {
 
   container_definitions = jsonencode([{
     name      = var.container_name
-    image     = "${aws_ecr_repository.app.repository_url}:latest"
+    image     = "${aws_ecr_repository.app.repository_url}:${var.image_tag}"
     essential = true
     environment = [
       { name = "NODE_ENV", value = "production" },
@@ -121,6 +121,14 @@ resource "aws_ecs_task_definition" "app" {
       hostPort      = var.container_port
     }]
   }])
+}
+
+resource "aws_ecs_service" "main" {
+  name            = "${var.app_name}-service"
+  cluster         = aws_ecs_cluster.main.id
+  task_definition = aws_ecs_task_definition.app.arn
+  desired_count   = 1
+  launch_type     = "EC2"
 }
 
 data "aws_ami" "ecs_optimized" {
