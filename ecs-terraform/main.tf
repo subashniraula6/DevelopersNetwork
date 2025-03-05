@@ -101,8 +101,8 @@ resource "aws_ecs_task_definition" "app" {
   family                   = "${var.app_name}-task"
   network_mode             = "bridge"
   requires_compatibilities = ["EC2"]
-  cpu    = 1024  # Increased from 256
-  memory = 2048  # Increased from 512
+  cpu    = 512  # Increased from 256
+  memory = 512  # Increased from 512
   execution_role_arn       = aws_iam_role.ecs_execution_role.arn
 
   container_definitions = jsonencode([{
