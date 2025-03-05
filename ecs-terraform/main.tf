@@ -101,8 +101,8 @@ resource "aws_ecs_task_definition" "app" {
   family                   = "${var.app_name}-task"
   network_mode             = "bridge"
   requires_compatibilities = ["EC2"]
-  cpu                      = 256
-  memory                   = 512
+  cpu    = 1024  # Increased from 256
+  memory = 2048  # Increased from 512
   execution_role_arn       = aws_iam_role.ecs_execution_role.arn
 
   container_definitions = jsonencode([{
@@ -118,9 +118,32 @@ resource "aws_ecs_task_definition" "app" {
     ]
     portMappings = [{
       containerPort = var.container_port
-      hostPort      = 80
+      hostPort      = 0
     }]
+    logConfiguration = {
+      logDriver = "awslogs",
+      options = {
+        awslogs-group         = "/ecs/${var.app_name}-task",
+        awslogs-region        = var.aws_region,
+        awslogs-stream-prefix = "ecs"
+      }
+    }
   }])
+}
+
+resource "aws_cloudwatch_log_group" "ecs" {
+  name              = "/ecs/${var.app_name}-task"
+  retention_in_days = 7
+}
+
+resource "aws_iam_role_policy_attachment" "cloudwatch_logs" {
+  role       = aws_iam_role.ecs_execution_role.name
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchLogsFullAccess"
+}
+
+resource "aws_iam_role_policy_attachment" "ecr_read" {
+  role       = aws_iam_role.ecs_execution_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
 }
 
 resource "aws_ecs_service" "main" {
@@ -129,6 +152,10 @@ resource "aws_ecs_service" "main" {
   task_definition = aws_ecs_task_definition.app.arn
   desired_count   = 1
   launch_type     = "EC2"
+  depends_on = [
+    aws_iam_role_policy_attachment.ecr_read,
+    aws_iam_role_policy_attachment.cloudwatch_logs
+  ]
 }
 
 data "aws_ami" "ecs_optimized" {
@@ -159,4 +186,9 @@ resource "aws_iam_role" "ecs_execution_role" {
 resource "aws_iam_role_policy_attachment" "ecs_execution_policy" {
   role       = aws_iam_role.ecs_execution_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+}
+
+resource "aws_iam_role_policy_attachment" "ecs_ec2_policy" {
+  role       = aws_iam_role.ecs_instance_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
