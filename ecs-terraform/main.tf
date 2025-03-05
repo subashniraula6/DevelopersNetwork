@@ -113,8 +113,8 @@ resource "aws_ecs_task_definition" "app" {
       { name = "NODE_ENV", value = "production" },
       { name = "MONGO_URI", value = var.mongo_uri },
       { name = "JWT_SECRET", value = var.jwt_secret },
-      { name = "GITHUB_CLIENT_ID", value = var.github_client_id },
-      { name = "GITHUB_SECRET", value = var.github_secret }
+      { name = "GIT_HUB_CLIENT_ID", value = var.github_client_id },
+      { name = "GIT_HUB_SECRET", value = var.github_secret }
     ]
     portMappings = [{
       containerPort = var.container_port
