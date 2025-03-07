@@ -101,8 +101,8 @@ resource "aws_ecs_task_definition" "app" {
   family                   = "${var.app_name}-task"
   network_mode             = "bridge"
   requires_compatibilities = ["EC2"]
-  cpu    = 512  # Increased from 256
-  memory = 512  # Increased from 512
+  cpu    = 256
+  memory = 256
   execution_role_arn       = aws_iam_role.ecs_execution_role.arn
 
   container_definitions = jsonencode([{
@@ -118,7 +118,7 @@ resource "aws_ecs_task_definition" "app" {
     ]
     portMappings = [{
       containerPort = var.container_port
-      hostPort      = 0
+      hostPort      = 80
     }]
     logConfiguration = {
       logDriver = "awslogs",
@@ -128,6 +128,16 @@ resource "aws_ecs_task_definition" "app" {
         awslogs-stream-prefix = "ecs"
       }
     }
+    healthCheck = {
+    command     = [
+      "CMD-SHELL", 
+      "wget --quiet --tries=1 --spider http://localhost:3000/login || exit 1"
+    ]
+    interval    = 30
+    timeout     = 5
+    retries     = 3
+    startPeriod = 60
+  }
   }])
 }
 
