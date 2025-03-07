@@ -3,7 +3,6 @@ import { Link, withRouter } from 'react-router-dom'
 import { addEducation } from '../../actions/profile.actions'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { Button, Checkbox, TextareaAutosize, TextField } from '@material-ui/core'
 
 const AddEducation = ({ addEducation, history }) => {
 
@@ -33,7 +32,7 @@ const AddEducation = ({ addEducation, history }) => {
         })
     }
 
-    const [toDateDisabled, setToDateDisabled] = useState(false);
+    const [ toDateDisabled, setToDateDisabled ] = useState(false);
 
     const handleSubmit = event => {
         event.preventDefault();
@@ -54,10 +53,9 @@ const AddEducation = ({ addEducation, history }) => {
             <small>* = required field</small>
             <form className="form">
                 <div className="form-group">
-                    <TextField
-                        variant='standard'
+                    <input
                         type="text"
-                        label="* School or Bootcamp"
+                        placeholder="* School or Bootcamp"
                         name="school"
                         value={school}
                         onChange={(e) => handleChange(e)}
@@ -65,10 +63,9 @@ const AddEducation = ({ addEducation, history }) => {
                     />
                 </div>
                 <div className="form-group">
-                    <TextField
-                        variant='standard'
+                    <input
                         type="text"
-                        label="* Degree or Certificate"
+                        placeholder="* Degree or Certificate"
                         name="degree"
                         value={degree}
                         onChange={(e) => handleChange(e)}
@@ -76,19 +73,11 @@ const AddEducation = ({ addEducation, history }) => {
                     />
                 </div>
                 <div className="form-group">
-                    <TextField
-                        variant='standard'
-                        type="text"
-                        label="* Faculty"
-                        name="faculty"
-                        value={faculty}
-                        onChange={(e) => handleChange(e)}
-                    />
+                    <input type="text" placeholder="* Faculty" name="faculty" value={faculty} onChange={(e) => handleChange(e)} />
                 </div>
                 <div className="form-group">
                     <h4>From Date</h4>
-                    <TextField
-                        variant='standard'
+                    <input
                         type="date"
                         name="from"
                         value={from}
@@ -96,9 +85,7 @@ const AddEducation = ({ addEducation, history }) => {
                 </div>
                 <div className="form-group">
                     <p>
-                        <Checkbox
-                            type="checkbox"
-                            name="current"
+                        <input type="checkbox" name="current"
                             value={current}
                             checked={current}
                             onChange={(e) => {
@@ -109,26 +96,21 @@ const AddEducation = ({ addEducation, history }) => {
                 </div>
                 <div className="form-group">
                     <h4>To Date</h4>
-                    <TextField
-                        variant='standard'
-                        type="date"
-                        name="to"
-                        value={to}
-                        value={toDateDisabled ? '' : to}
+                    <input type="date" name="to" value={to}
+                        value = { toDateDisabled ? '' : to }
                         onChange={(e) => handleChange(e)}
                         disabled={toDateDisabled ? 'disabled' : null}
                     />
                 </div>
                 <div className="form-group">
-                    <TextareaAutosize
-                        rowsMin={3}
+                    <textarea
                         name="description"
                         cols="30"
                         rows="5"
                         placeholder="Program Description"
                         value={description}
                         onChange={(e) => handleChange(e)}
-                    ></TextareaAutosize>
+                    ></textarea>
                 </div>
                 <input type="submit" className="btn btn-primary my-1" onClick={(e) => handleSubmit(e)} />
                 <Link className="btn btn-light my-1" to="/dashboard">Go Back</Link>

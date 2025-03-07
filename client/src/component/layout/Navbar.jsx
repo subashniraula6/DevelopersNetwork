@@ -3,21 +3,22 @@ import { Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { logOutUser } from '../../actions/auth.actions'
-import { FaConnectdevelop } from 'react-icons/fa'
+
 
 const Navbar = ({ auth: { isLoading, isAuthenticated }, logOutUser }) => {
     const authLinks = (
         <ul>
-            <li><Link to="/profiles"><i class="fa fa-users" aria-hidden="true" style={{ 'color': 'white', 'margin-right': '3px' }}></i>Developers</Link></li>
+            <li><i class="fa fa-users" aria-hidden="true"></i><Link to="/profiles">Developers</Link></li>
             <li><Link to="/posts">Posts</Link></li>
             <li>
-                <Link to='/login' onClick={logOutUser}><i className="fas fa-sign-out-alt" style={{ 'color': 'white', 'margin-right': '3px' }}></i>Logout </Link>
+                <i className="fas fa-sign-out-alt"></i>
+                <Link to='/login' onClick={logOutUser}>Logout </Link>
             </li>
         </ul>
     );
     const guestLinks = (
         <ul>
-            <li><Link to="/profiles"><i className="fa fa-users" aria-hidden="true" style={{ 'color': 'white', marginRight: '3px' }}></i>Developers</Link></li>
+            <li><i class="fa fa-users" aria-hidden="true"></i><Link to="/profiles">Developers</Link></li>
             <li><Link to="/register">Register</Link></li>
             <li>
                 <Link to="/login">Login</Link> {/* Login redirects to Dashboard */}
@@ -26,10 +27,9 @@ const Navbar = ({ auth: { isLoading, isAuthenticated }, logOutUser }) => {
     );
 
     return (
-        <nav className="navbar bg-orange">
+        <nav className="navbar bg-dark">
             <h1>
-                <Link to="/">
-                    <FaConnectdevelop /> DevNetwork</Link>
+                <Link to="/"><i className="fas fa-code"></i> DevNetwork</Link>
             </h1>
             {
                 !isLoading && (<Fragment> { isAuthenticated ? authLinks : guestLinks}</Fragment>)

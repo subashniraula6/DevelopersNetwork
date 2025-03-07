@@ -8,7 +8,6 @@ import DashboardAction from './DashboardActions'
 import ExperienceList from './ExperienceList'
 import EducationList from './EducationList'
 import { deleteAccount } from '../../actions/profile.actions'
-import Button from '@material-ui/core/Button'
 
 const Dashboard = ({ getCurrentProfile, deleteAccount, profile: { profile, isLoading }, auth: { user } }) => {
     useEffect(() => {
@@ -26,10 +25,7 @@ const Dashboard = ({ getCurrentProfile, deleteAccount, profile: { profile, isLoa
                 { profile === null ?
                     (<Fragment>
                         <p>You have not yet setup a profile. Please add some info.</p>
-
-                        <Button variant='contained' color='primary'>
-                            <Link to="/create-profile">Create Profile</Link>
-                        </Button>
+                        <Link to="/create-profile" className="btn btn-primary">Create Profile</Link>
                     </Fragment>) :
                     (<Fragment>
                         <DashboardAction />
@@ -38,10 +34,10 @@ const Dashboard = ({ getCurrentProfile, deleteAccount, profile: { profile, isLoa
                     </Fragment>)
                 }
                 <div className="my-2">
-                    <Button variant='contained' color='secondary' onClick={deleteAccount}>
+                    <button className="btn btn-danger" onClick={deleteAccount}>
                         <i className="fas fa-user-minus"></i>
                                 &nbsp; Delete My Account
-                            </Button>
+                            </button>
                 </div>
             </Fragment>
         )

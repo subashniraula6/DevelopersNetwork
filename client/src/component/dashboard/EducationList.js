@@ -3,7 +3,6 @@ import PropTypes from 'prop-types'
 import Moment from 'react-moment'
 import { connect } from 'react-redux'
 import { deleteEducation } from '../../actions/profile.actions'
-import Button from '@material-ui/core/Button'
 
 const EducationList = ({ education, deleteEducation }) => {
 
@@ -21,9 +20,9 @@ const EducationList = ({ education, deleteEducation }) => {
                     }
                 </td>
                 <td>
-                    <Button variant='contained' color='secondary' onClick={() => deleteEducation(edu._id) }>
+                    <button className="btn btn-danger" onClick={() => deleteEducation(edu._id) }>
                         Delete
-                    </Button>
+                    </button>
                 </td>
             </tr>
         )
