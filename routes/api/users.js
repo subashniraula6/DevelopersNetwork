@@ -5,7 +5,7 @@ const { check, validationResult } = require('express-validator')
 const gravatar = require('gravatar')
 const User = require('../../models/users_model')
 const jwt = require('jsonwebtoken')
-const config = require('config')
+const config = require('../../config')
 
 //@route Request-type='POST' End-point='api/users'
 // @route    POST api/users

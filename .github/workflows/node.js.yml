@@ -2,9 +2,16 @@ name: Node.js CI/CD
 
 on:
   push:
-    branches: ["master", "pipelines"]
+    branches: ["master", "pipelines", "new-pipeline"]
   pull_request:
     branches: ["master"]
+env:
+  AWS_REGION: ${{ vars.AWS_REGION }}
+  ECR_REPOSITORY: devnetwork-repo
+  ECS_CLUSTER: devnetwork-cluster 
+  TASK_DEFINITION_FAMILY: devnetwork-task
+  ECS_SERVICE: devnetwork-service
+  CONTAINER_NAME: "app"
 
 jobs:
   build-and-deploy:
@@ -15,44 +22,64 @@ jobs:
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
+        
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
 
       - name: Log in to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
-      - name: Create ECR Repository if Not Exists
-        env:
-          AWS_REGION: ${{ vars.AWS_REGION }}
-          ECR_REPOSITORY: devnetwork-repository
-        run: |
-          echo "Checking if ECR repository exists..."
-          if ! aws ecr describe-repositories --region $AWS_REGION --repository-names $ECR_REPOSITORY > /dev/null 2>&1; then
-            echo "ECR repository does not exist. Creating..."
-            aws ecr create-repository --repository-name $ECR_REPOSITORY --region $AWS_REGION
-          else
-            echo "ECR repository already exists."
-          fi
-
       - name: Build and Push Docker Image
-        id: build-image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: devnetwork-repository
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          echo "Building Docker image..."
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-          echo "Pushing Docker image..."
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+          docker build -t $ECR_REGISTRY/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG
+          echo "IMAGE_URI=$ECR_REGISTRY/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG" >> $GITHUB_ENV
 
-
-      # - name: Update ECS Service
-      #   env:
-      #     AWS_REGION: your-aws-region                  # e.g., us-east-1
-      #     ECS_CLUSTER: your-ecs-cluster-name           # Replace with your ECS cluster name
-      #     ECS_SERVICE: your-ecs-service-name           # Replace with your ECS service name
-      #     IMAGE_URI: ${{ steps.build-image.outputs.image }}
-      #   run: |
-      #     echo "Updating ECS service..."
-      #     aws ecs update-service --cluster $ECS_CLUSTER --service $ECS_SERVICE --force-new-deployment --region $AWS_REGION
+      - name: Update ECS Task Definition
+        run: |
+          # Get current task definition
+          CURRENT_TASK_DEF=$(aws ecs describe-task-definition \
+            --task-definition $TASK_DEFINITION_FAMILY)
+      
+          # Create new task definition with updated image
+          NEW_TASK_DEF=$(echo "$CURRENT_TASK_DEF" | jq \
+            --arg IMAGE_URI "${{ env.IMAGE_URI }}" \
+            --arg CONTAINER_NAME "${{ env.CONTAINER_NAME }}" \
+            '.taskDefinition | 
+            del(
+              .taskDefinitionArn,
+              .revision,
+              .status,
+              .requiresAttributes,
+              .registeredAt,
+              .registeredBy,
+              .compatibilities,
+              .executionRoleArn  # Keep this if needed
+            ) |
+            .containerDefinitions |= map(if .name == $CONTAINER_NAME then .image = $IMAGE_URI else . end)')
+      
+          echo "$NEW_TASK_DEF" > new_task_definition.json
+          
+          # Register new revision
+          aws ecs register-task-definition \
+            --cli-input-json file://new_task_definition.json
+      
+          # Update service with explicit revision
+          LATEST_REVISION=$(aws ecs describe-task-definition \
+            --task-definition $TASK_DEFINITION_FAMILY \
+            --query 'taskDefinition.revision' \
+            --output text)
+          
+          aws ecs update-service \
+            --cluster $ECS_CLUSTER \
+            --service $ECS_SERVICE \
+            --task-definition "$TASK_DEFINITION_FAMILY:$LATEST_REVISION" \
+            --force-new-deployment

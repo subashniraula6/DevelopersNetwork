@@ -1,0 +1,9 @@
+node_modules
+client/node_modules
+client/.next
+client/dist
+.git
+.github
+Dockerfile
+.gitignore
+.env
