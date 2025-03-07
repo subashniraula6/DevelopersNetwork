@@ -131,7 +131,7 @@ resource "aws_ecs_task_definition" "app" {
     healthCheck = {
     command     = [
       "CMD-SHELL", 
-      "wget --quiet --tries=1 --spider http://localhost:3000/login || exit 1"
+      "wget --quiet --tries=1 --spider http://localhost:5000/login || exit 1"
     ]
     interval    = 30
     timeout     = 5
