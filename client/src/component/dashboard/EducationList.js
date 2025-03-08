@@ -28,7 +28,7 @@ const EducationList = ({ education, deleteEducation }) => {
         )
     })
     return (
-        <section className="container">
+        <section>
             <h2 className='my-2'> Education Credentials </h2>
             <table className='table'>
                 <thead>

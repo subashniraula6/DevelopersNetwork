@@ -31,7 +31,7 @@ const ExperienceList = ({ experience, deleteExperience }) => {
         )
     })
     return (
-        <section className="container">
+        <section>
             <h2 className='my-2'> Experience Credentials </h2>
             <table className='table'>
                 <thead>

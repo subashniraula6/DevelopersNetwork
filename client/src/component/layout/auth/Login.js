@@ -3,6 +3,7 @@ import { Link, Redirect } from 'react-router-dom';
 import { loginUser } from '../../../actions/auth.actions'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
+import { Fragment } from 'react';
 
 const Login = ({ loginUser, auth }) => {
     const [formData, setFormData] = useState({ email: "", password: "" });
