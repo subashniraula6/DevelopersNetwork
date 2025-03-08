@@ -34,7 +34,7 @@ const Login = ({ loginUser, auth }) => {
     }
 
     return (
-        <Fragment>
+        <div className='login-container'>
             <h1 className="large text-primary">Sign In</h1>
             <p className="lead"><i className="fas fa-user"></i> Login to your account</p>
             <form className="form" onSubmit={handleSubmit}>
@@ -67,7 +67,7 @@ const Login = ({ loginUser, auth }) => {
             <p className="my-1">
                 Do not have an account? <Link to="/register">Register</Link>
             </p>
-        </Fragment>
+        </div>
     )
 }
 
