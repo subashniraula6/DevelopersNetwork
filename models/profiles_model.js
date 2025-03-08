@@ -23,6 +23,9 @@ const ProfileSchema = new Schema({
         type: [String],
         required: true
     },
+    avatar: {
+        type: String
+    },
     bio: {
         type: String
     },

@@ -23,9 +23,9 @@ const PostItem = ({ auth, addLike, removeLike, deletePost, showActions,
                     </Link>
                 </div>
                 <div>
-                    <p className="my-1">
+                    <pre className="my-1">
                         {text}
-                    </p>
+                    </pre>
                     <p className="post-date">
                         Posted on : <Moment format="YYYY/MM/DD">{date}</Moment>
                     </p>

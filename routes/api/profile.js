@@ -30,7 +30,7 @@ router.get('/me', auth, async (req, res) => {
 
 })
 
-// @route    POST api/profile/me
+// @route    POST api/profile/
 // @desc     Make/Update profile
 // @access   Private 
 router.post('/', [auth, [
@@ -72,6 +72,7 @@ router.post('/', [auth, [
     profileFields.status = status;// Required field
     profileFields.githubusername = githubusername ? githubusername : "";
     profileFields.skills = skills.split(',').map(skill => skill.trim()); //Required field
+    profileFields.avatar = ""
 
 
     // //build profilefield's social object
@@ -90,6 +91,25 @@ router.post('/', [auth, [
     profileFields.social.instagram = instagram ? instagram : '';
     profileFields.social.twitter = twitter ? twitter : '';
     profileFields.social.linkedin = linkedin ? linkedin : '';
+
+    // Add avatar from Github if usernname added
+    if(githubusername) {
+        try {
+            const options = {
+                uri: `https://api.github.com/users/${githubusername}`,
+                method: 'GET',
+                headers: { 'user-agent': 'node.js' }
+            };
+    
+            request(options, (error, response, body) => {
+                if(response.statusCode == 200) {
+                    profileFields.avatar = JSON.parse(body).avatar_url 
+                }
+            })
+        } catch (err) {
+            profileFields.avatar = ""
+        }
+    }
 
     try {
         const profile = await Profile.findOne({ user: req.user.id })

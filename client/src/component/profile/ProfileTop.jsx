@@ -1,7 +1,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-const ProfileTop = ({ profile: { user: { name, avatar },
+const ProfileTop = ({ profile: { user: { name },
+    avatar,
     status,
     location,
     company,
