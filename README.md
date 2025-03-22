@@ -50,5 +50,3 @@ For a smooth development workflow, run the frontend and backend servers concurre
 - This project requires React 16 on the client side.
 
 ## License
-
-Specify your project's license here
