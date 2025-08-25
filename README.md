@@ -4,11 +4,11 @@ A community application using React.js, Node.js, and MongoDB. Deployed with Dock
 
 ## Requirements
 
-- **Node.js** (v12 or later recommended)
+- **Node.js** (V12 or <= V18 recommended)
 - **npm**
 - **React 16** for the frontend
 
-## Setup and Installation
+## Running the Application in Development
 
 ### Frontend
 
@@ -23,31 +23,53 @@ A community application using React.js, Node.js, and MongoDB. Deployed with Dock
 
 1. Navigate to the root directory of the project (if not already there) and install dependencies:
     `npm install`
-2. To run the backend server, you have two options:
+2. Setup Environment Variables:
+  <br />
+  a. Copy environment from template: `cp .env-dev .env`
+  <br />
+  b. Insert Proper value of encironment variables of in the new file **.env**
+3. To run the backend server, you have two options:
   - Without hot-reloading:
     `node server.js`
   - With hot-reloading (if you have [nodemon](https://nodemon.io/) installed):
     `nodemon server.js`
 
-## Running the Application in Development
-
-For a smooth development workflow, run the frontend and backend servers concurrently:
-
-1. **Frontend Server**:
-  - Open a terminal, navigate to the `client` folder, and execute:
-    `cd client`
-    `npm start`
-2. **Backend Server**:
-  - In another terminal at the project root, run either:
-    `node server.js`
-    or
-    `nodemon server.js`
-
-## Additional Information
-
-- Ensure you have the correct versions of Node.js and npm installed.
-- If `nodemon` is not installed globally, install it using:
-    `npm install -g nodemon`
-- This project requires React 16 on the client side.
-
-## License
+## For Production
+### 1. Provision AWS Infrastructure
+Preliminary requirements:
+#### Install Terraform and AWS cli
+a. MacOs
+`brew tap hashicorp/tap`
+`brew install hashicorp/tap/terraform`
+`bre install awscli`
+`aws configure`
+b. Linux
+Follow Documentation of Terraform and AWS CLI
+<br />
+a. Change Directory: `cd Terraform`
+<br />
+b. Create S3Bucket for storing State Files and Update the bucket name in main.tf, **backend.s3** block: 
+<br />
+c. Make sure awscli installed and aws credentials is configured:
+<br />
+d. Run Terraform init:
+<br />
+`terraform init`
+<br />
+e. Run terraform plan and see the planned resources:
+<br />
+f. Add variables:
+```sh
+cat <<EOF > terraform.tfvars
+region            = "[region]"
+mongo_uri         = "[mongo_uri]"
+jwt_secret        = "[jwt_secret]"
+github_client_id  = "[github_client_id]"
+github_secret     = "[github_secret]"
+EOF
+```
+`terraform plan`
+<br />
+g. Run terraform apply:
+<br />
+`terraform apply`

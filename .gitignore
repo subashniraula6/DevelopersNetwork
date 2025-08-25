@@ -1,5 +1,6 @@
 node_modules/
 config/default.json
 build/
-ecs-terraform/.terraform/
+**/.terraform/
 .env
+**/*.tfvars
