@@ -27,6 +27,6 @@ COPY --from=builder /app/client/build ./client/build
 
 COPY . .
 
-EXPOSE 5000
+EXPOSE 6000
 
 CMD ["node", "server.js"]
