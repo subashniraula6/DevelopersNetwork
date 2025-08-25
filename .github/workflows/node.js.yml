@@ -19,9 +19,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
         
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -45,8 +42,8 @@ jobs:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          docker buildx use buildx-builder
-          docker buildx build -t $ECR_REGISTRY/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG . --push
+          docker build -t $ECR_REGISTRY/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG
           echo "IMAGE_URI=$ECR_REGISTRY/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG" >> $GITHUB_ENV
 
       - name: Update ECS Task Definition
