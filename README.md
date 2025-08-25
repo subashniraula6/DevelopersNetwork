@@ -1,75 +1,149 @@
-Live Link: http://devnet.thebasanta.xyz/
-# Project Name
-A community application using React.js, Node.js, and MongoDB. Deployed with Docker and Amazon ECS.
+# 🚀 Project Name
 
-## Requirements
+A **community web application** built with **React.js, Node.js, and MongoDB**, deployed using **Docker** and **Amazon ECS**.
 
-- **Node.js** (V12 or <= V18 recommended)
-- **npm**
-- **React 16** for the frontend
+🔗 **Live Demo:** [http://devnet.thebasanta.xyz/](http://devnet.thebasanta.xyz/)
 
-## Running the Application in Development
+---
 
-### Frontend
+## 📦 Tech Stack
 
-1. Open your terminal and navigate to the `client` directory:
-    `cd client`
-2. Install the required dependencies:
-    `npm install`
-3. Start the development server:
-    `npm start`
+* **Frontend:** React 16
+* **Backend:** Node.js + Express
+* **Database:** MongoDB
+* **Deployment:** Docker, AWS ECS, Terraform
 
-### Backend
+---
 
-1. Navigate to the root directory of the project (if not already there) and install dependencies:
-    `npm install`
-2. Setup Environment Variables:
-  <br />
-  a. Copy environment from template: `cp .env-dev .env`
-  <br />
-  b. Insert Proper value of encironment variables of in the new file **.env**
-3. To run the backend server, you have two options:
-  - Without hot-reloading:
-    `node server.js`
-  - With hot-reloading (if you have [nodemon](https://nodemon.io/) installed):
-    `nodemon server.js`
+## ⚙️ Requirements
 
-## For Production
-### 1. Provision AWS Infrastructure
-Preliminary requirements:
-#### Install Terraform and AWS cli
-a. MacOs
-`brew tap hashicorp/tap`
-`brew install hashicorp/tap/terraform`
-`bre install awscli`
-`aws configure`
-b. Linux
-Follow Documentation of Terraform and AWS CLI
-<br />
-a. Change Directory: `cd Terraform`
-<br />
-b. Create S3Bucket for storing State Files and Update the bucket name in main.tf, **backend.s3** block: 
-<br />
-c. Make sure awscli installed and aws credentials is configured:
-<br />
-d. Run Terraform init:
-<br />
-`terraform init`
-<br />
-e. Run terraform plan and see the planned resources:
-<br />
-f. Add variables:
-```sh
-cat <<EOF > terraform.tfvars
-region            = "[region]"
-mongo_uri         = "[mongo_uri]"
-jwt_secret        = "[jwt_secret]"
-github_client_id  = "[github_client_id]"
-github_secret     = "[github_secret]"
-EOF
+* **Node.js** (v12 – v18 recommended)
+* **npm**
+* **Terraform**
+* **AWS CLI**
+
+---
+
+## 🛠️ Development Setup
+
+### 1. Frontend (React)
+
+```bash
+cd client
+npm install
+npm start
 ```
-`terraform plan`
-<br />
-g. Run terraform apply:
-<br />
-`terraform apply`
+
+Frontend will start on [http://localhost:3000](http://localhost:3000).
+
+---
+
+### 2. Backend (Node.js)
+
+```bash
+# From project root
+npm install
+```
+
+Setup environment variables:
+
+```bash
+cp .env-dev .env
+# edit .env with correct values
+```
+
+Run backend:
+
+```bash
+# Without hot reload
+node server.js
+
+# With hot reload (if nodemon installed)
+nodemon server.js
+```
+
+Backend will run on [http://localhost:5000](http://localhost:5000) by default.
+
+---
+
+## 🌐 Production Deployment
+
+### 1. Provision AWS Infrastructure (via Terraform)
+
+#### Install Terraform & AWS CLI
+
+**MacOS**
+
+```bash
+brew tap hashicorp/tap
+brew install hashicorp/tap/terraform
+brew install awscli
+aws configure
+```
+
+**Linux**
+👉 Follow official docs for [Terraform](https://developer.hashicorp.com/terraform/downloads) & [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
+
+---
+
+#### Terraform Setup
+
+```bash
+cd Terraform
+```
+
+* Create **S3 bucket** for Terraform state.
+* Update `main.tf` → `backend.s3` block with your bucket name.
+* Ensure AWS CLI is configured with valid credentials.
+
+Run Terraform:
+
+```bash
+terraform init
+terraform plan
+```
+
+Add variables in `terraform.tfvars`:
+
+```hcl
+region            = "your-region"
+mongo_uri         = "your-mongo-uri"
+jwt_secret        = "your-jwt-secret"
+github_client_id  = "your-github-client-id"
+github_secret     = "your-github-secret"
+ecr_repo_name     = "your-ecr-repo-name"
+```
+
+Apply changes:
+
+```bash
+terraform apply
+```
+
+---
+
+### 2. GitHub Actions Setup
+
+Update **GitHub Secrets & Variables** with resources created from Terraform, including:
+
+* `AWS_ACCESS_KEY_ID`
+* `AWS_SECRET_ACCESS_KEY`
+* `AWS_REGION`
+* `ECR_REPOSITORY`
+* `ECS_CLUSTER`
+* `ECS_SERVICE`
+* `TASK_DEFINITION_FAMILY`
+* `CONTAINER_NAME`
+
+This ensures CI/CD pipeline builds & deploys your app automatically.
+
+---
+
+## ✅ Features
+
+* 📡 Full-stack app with modern JS frameworks
+* 🐳 Containerized using Docker
+* ☁️ Automated infrastructure with Terraform
+* 🔄 CI/CD via GitHub Actions + ECS
+
+---
