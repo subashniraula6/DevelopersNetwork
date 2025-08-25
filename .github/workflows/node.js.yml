@@ -31,12 +31,6 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
-      - name: Debug variables
-        run: |
-          echo "ECR_REGISTRY=${{ steps.login-ecr.outputs.registry }}"
-          echo "ECR_REPOSITORY=${{ env.ECR_REPOSITORY }}"
-          echo "IMAGE_TAG=${{ github.sha }}"
-
       - name: Build and Push Docker Image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
@@ -56,7 +50,7 @@ jobs:
       
           # Create new task definition with updated image
           NEW_TASK_DEF=$(echo "$CURRENT_TASK_DEF" | jq \
-            --arg IMAGE_URI "${{ env.IMAGE_URI }}" \
+            --arg IMAGE_URI "$IMAGE_URI" \
             --arg CONTAINER_NAME "${{ env.CONTAINER_NAME }}" \
             '.taskDefinition | 
             del(
