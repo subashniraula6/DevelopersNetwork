@@ -7,11 +7,11 @@ on:
     branches: ["master"]
 env:
   AWS_REGION: ${{ vars.AWS_REGION }}
-  ECR_REPOSITORY: devnetwork-repo
-  ECS_CLUSTER: devnetwork-cluster 
-  TASK_DEFINITION_FAMILY: devnetwork-task
-  ECS_SERVICE: devnetwork-service
-  CONTAINER_NAME: "app"
+  ECR_REPOSITORY: ${{ vars.ECR_REPOSITORY }}
+  ECS_CLUSTER: ${{ vars.ECS_CLUSTER }}
+  TASK_DEFINITION_FAMILY: ${{ vars.TASK_DEFINITION_FAMILY }}
+  ECS_SERVICE: ${{ vars.ECS_SERVICE }}
+  CONTAINER_NAME: ${{ vars.CONTAINER_NAME }}
 
 jobs:
   build-and-deploy:
