@@ -5,7 +5,7 @@ A **community web application** built with **React.js, Node.js, and MongoDB**, d
 🔗 **Live Demo:** [http://devnet.thebasanta.xyz/](http://devnet.thebasanta.xyz/)
 
 ## Architecture Diagram
-![Alt text](/static/z)
+![Alt text](/static/devnet-diagram.png)
 
 ---
 
