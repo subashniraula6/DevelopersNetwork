@@ -5,7 +5,7 @@ A **community web application** built with **React.js, Node.js, and MongoDB**, d
 🔗 **Live Demo:** [http://devnet.thebasanta.xyz/](http://devnet.thebasanta.xyz/)
 
 ## Architecture Diagram
-![Architecture Diagram](/static/devnet-diagram.png)
+![Alt text](/static/z)
 
 ---
 
@@ -108,13 +108,15 @@ terraform plan
 
 Add variables in `terraform.tfvars`:
 
-```hcl
-region            = "your-region"
-mongo_uri         = "your-mongo-uri"
-jwt_secret        = "your-jwt-secret"
-github_client_id  = "your-github-client-id"
-github_secret     = "your-github-secret"
-ecr_repo_name     = "your-ecr-repo-name"
+```sh
+cat <<EOF > terraform.tfvars
+region            = "[region]"
+mongo_uri         = "[mongo_uri]"
+jwt_secret        = "[jwt_secret]"
+github_client_id  = "[github_client_id]"
+github_secret     = "[github_secret]"
+ecr_repo_name     = "[ecr_repo_name]"
+EOF
 ```
 
 Apply changes:
