@@ -127,22 +127,30 @@ terraform apply
 
 ---
 
-### 2. GitHub Actions Setup
+### 2. CI/CD GitHub Actions Setup
+* Add GitHub secrets for AWS, ECR, ECS, and task definition:
 
-Update **GitHub Secrets & Variables** with resources created from Terraform, including:
+  * `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_REGION`
+  * `ECR_REPOSITORY`, `ECS_CLUSTER`, `ECS_SERVICE`
+  * `TASK_DEFINITION_FAMILY`, `CONTAINER_NAME`
+* Push to the `master` or configured branch to trigger the pipeline.
+* GitHub Actions will build the Docker image, push to ECR, register a new ECS task definition, and update the ECS service automatically.
 
-* `AWS_ACCESS_KEY_ID`
-* `AWS_SECRET_ACCESS_KEY`
-* `AWS_REGION`
-* `ECR_REPOSITORY`
-* `ECS_CLUSTER`
-* `ECS_SERVICE`
-* `TASK_DEFINITION_FAMILY`
-* `CONTAINER_NAME`
+### ⚠️ Manual ECS Task Stop
 
-This ensures CI/CD pipeline builds & deploys your app automatically.
+> Using minimal CPU/memory may prevent automatic rollout. To deploy the new task:
 
----
+**CLI:**
+
+```bash
+aws ecs list-tasks --cluster <cluster> --service-name <service>
+aws ecs stop-task --cluster <cluster> --task <task_id>
+```
+
+**Console:** ECS → Cluster → Service → Tasks → Select task → Stop
+
+> Not recommended for enterprise, but cost-efficient for minimal resources.
+
 
 ## ✅ Features
 
