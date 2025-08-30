@@ -138,7 +138,7 @@ terraform apply
 
 ### ⚠️ Manual ECS Task Stop
 
-> Using minimal CPU/memory may prevent automatic rollout. To deploy the new task:
+> Since I am using minimal CPU/memory which may prevent automatic rollout. To deploy the new task:
 
 **CLI:**
 
