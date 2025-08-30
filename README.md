@@ -1,4 +1,4 @@
-# 🚀 Project Name
+# 🚀 DevNetwork
 
 A **community web application** built with **React.js, Node.js, and MongoDB**, deployed using **Docker** and **Amazon ECS**.
 
