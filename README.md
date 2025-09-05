@@ -4,16 +4,20 @@ A **community web application** built with **React.js, Node.js, and MongoDB**, d
 
 🔗 **Live Demo:** [http://devnet.thebasanta.xyz/](http://devnet.thebasanta.xyz/)
 
-## Architecture Diagram
-![Alt text](/static/devnet-diagram.png)
+---
+
+## 🏗️ Architecture Diagram
+
+![DevNetwork Architecture](/static/devnet-diagram.png)
 
 ---
 
 ## 📦 Tech Stack
 
-* **Frontend:** React 16
+* **Frontend:** React 16 + Redux Thunk
 * **Backend:** Node.js + Express
-* **Database:** MongoDB
+* **Database:** MongoDB (Cloud Based: MongoDB Atlas)
+* **Authentication:** JWT
 * **Deployment:** Docker, AWS ECS, Terraform
 
 ---
@@ -27,7 +31,7 @@ A **community web application** built with **React.js, Node.js, and MongoDB**, d
 
 ---
 
-## 🛠️ Development Setup
+## 🛠️ Local Development Setup
 
 ### 1. Frontend (React)
 
@@ -37,14 +41,15 @@ npm install
 npm start
 ```
 
-Frontend will start on [http://localhost:3000](http://localhost:3000).
+Frontend runs on: [http://localhost:3000](http://localhost:3000)
 
 ---
 
-### 2. Backend (Node.js)
+### 2. Backend (Node.js + Express)
+
+From project root:
 
 ```bash
-# From project root
 npm install
 ```
 
@@ -52,7 +57,7 @@ Setup environment variables:
 
 ```bash
 cp .env-dev .env
-# edit .env with correct values
+# Edit .env with correct values
 ```
 
 Run backend:
@@ -61,21 +66,21 @@ Run backend:
 # Without hot reload
 node server.js
 
-# With hot reload (if nodemon installed)
+# With hot reload (requires nodemon)
 nodemon server.js
 ```
 
-Backend will run on [http://localhost:5000](http://localhost:5000) by default.
+Backend runs on: [http://localhost:5000](http://localhost:5000)
 
 ---
 
 ## 🌐 Production Deployment
 
-### 1. Provision AWS Infrastructure (via Terraform)
+### 1. Provision AWS Infrastructure (Terraform)
 
 #### Install Terraform & AWS CLI
 
-**MacOS**
+**MacOS:**
 
 ```bash
 brew tap hashicorp/tap
@@ -84,8 +89,11 @@ brew install awscli
 aws configure
 ```
 
-**Linux**
-👉 Follow official docs for [Terraform](https://developer.hashicorp.com/terraform/downloads) & [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
+**Linux:**
+Follow official docs:
+
+* [Terraform](https://developer.hashicorp.com/terraform/downloads)
+* [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
 
 ---
 
@@ -95,11 +103,11 @@ aws configure
 cd Terraform
 ```
 
-* Create **S3 bucket** for Terraform state.
+* Create an **S3 bucket** for Terraform state.
 * Update `main.tf` → `backend.s3` block with your bucket name.
 * Ensure AWS CLI is configured with valid credentials.
 
-Run Terraform:
+Initialize and plan:
 
 ```bash
 terraform init
@@ -119,7 +127,7 @@ ecr_repo_name     = "[ecr_repo_name]"
 EOF
 ```
 
-Apply changes:
+Apply infrastructure:
 
 ```bash
 terraform apply
@@ -127,18 +135,31 @@ terraform apply
 
 ---
 
-### 2. CI/CD GitHub Actions Setup
-* Add GitHub secrets for AWS, ECR, ECS, and task definition:
+### 2. CI/CD with GitHub Actions
 
-  * `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_REGION`
-  * `ECR_REPOSITORY`, `ECS_CLUSTER`, `ECS_SERVICE`
-  * `TASK_DEFINITION_FAMILY`, `CONTAINER_NAME`
-* Push to the `master` or configured branch to trigger the pipeline.
-* GitHub Actions will build the Docker image, push to ECR, register a new ECS task definition, and update the ECS service automatically.
+Add the following GitHub Secrets:
 
-### ⚠️ Manual ECS Task Stop
+* `AWS_ACCESS_KEY_ID`
+* `AWS_SECRET_ACCESS_KEY`
+* `AWS_REGION`
+* `ECR_REPOSITORY`
+* `ECS_CLUSTER`
+* `ECS_SERVICE`
+* `TASK_DEFINITION_FAMILY`
+* `CONTAINER_NAME`
 
-> Since I am using minimal CPU/memory which may prevent automatic rollout. To deploy the new task:
+When changes are pushed to the `master` branch (or configured branch):
+
+* Docker image is built
+* Image is pushed to **Amazon ECR**
+* ECS task definition is updated
+* ECS service is redeployed automatically
+
+---
+
+### ⚠️ Manual ECS Task Stop (Low Resource Setup)
+
+Since minimal CPU/memory is used, automatic rollouts may fail. To manually stop a task:
 
 **CLI:**
 
@@ -147,16 +168,18 @@ aws ecs list-tasks --cluster <cluster> --service-name <service>
 aws ecs stop-task --cluster <cluster> --task <task_id>
 ```
 
-**Console:** ECS → Cluster → Service → Tasks → Select task → Stop
+**AWS Console:**
+ECS → Cluster → Service → Tasks → Select task → Stop
 
-> Not recommended for enterprise, but cost-efficient for minimal resources.
+> ⚠️ Not recommended for production, but cost-efficient for minimal resource usage.
 
+---
 
 ## ✅ Features
 
 * 📡 Full-stack app with modern JS frameworks
+* 🔑 JWT-based authentication with **auth, posts, profile, and users routes**
+* ⚛️ React frontend with **Redux Thunk** for state management
 * 🐳 Containerized using Docker
 * ☁️ Automated infrastructure with Terraform
 * 🔄 CI/CD via GitHub Actions + ECS
-
----
