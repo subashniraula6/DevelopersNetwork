@@ -6,7 +6,11 @@ A **community web application** built with **React.js, Node.js, and MongoDB**, d
 
 ---
 
-## 🏗️ Architecture Diagram
+## 🖥️ Application Flow
+
+![Development Architecture](/static/DevNetwork-Development.png)
+
+## ☁️ Automation & Cloud deployment setup
 
 ![DevNetwork Architecture](/static/devnet-diagram.png)
 
